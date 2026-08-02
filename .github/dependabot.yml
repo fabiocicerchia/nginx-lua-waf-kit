@@ -1,0 +1,14 @@
+version: 2
+updates:
+  # Keep GitHub Actions pinned versions fresh.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+
+  # Uncomment and set the ecosystem for your project's dependencies.
+  # ecosystems: npm, pip, gomod, cargo, bundler, maven, composer, nuget, ...
+  # - package-ecosystem: npm
+  #   directory: /
+  #   schedule:
+  #     interval: weekly

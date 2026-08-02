@@ -1,0 +1,23 @@
+name: release
+
+# release-please reads Conventional Commit messages on main and keeps an open
+# "release PR" with the next version bump + CHANGELOG. Merging that PR tags the
+# release (vX.Y.Z) and publishes a GitHub Release. Nothing else to run.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write # create tags & releases
+  pull-requests: write # open/update the release PR
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v5
+        with:
+          # "simple" is language-agnostic (tracks version.txt + CHANGELOG).
+          # Swap for node/python/rust/etc. to also bump manifests.
+          release-type: simple

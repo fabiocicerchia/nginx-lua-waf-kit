@@ -1,0 +1,92 @@
+# Example wiring of the WAF kit into an nginx-lua server.
+#
+# Copy-pasteable, and versioned tag-for-tag against nginx-lua releases. Every
+# module is opt-in: delete the blocks you do not want and nothing else changes.
+#
+# Roll-out order that does not page anyone: start with everything in log_only,
+# read the logs for a week, then turn enforcement on one module at a time.
+
+# Shared dicts. The rate limiter needs one so limits are shared across worker
+# processes; JWKS caching needs the other only if you use RS256.
+lua_shared_dict waf_ratelimit 10m;
+lua_shared_dict waf_jwks      1m;
+lua_shared_dict waf_kill      12k;   # kill switch flag, readable with the control plane down
+
+lua_package_path "/opt/nginx-lua-waf-kit/lua/?.lua;;";
+
+init_by_lua_block {
+  waf = {
+    ratelimit = require "ratelimit",
+    bots      = require "bot_heuristics",
+    jwt       = require "jwt",
+    geo       = require "geo_asn",
+    mirror    = require "mirror",
+  }
+}
+
+# Geo/ASN data comes from ngx_http_geoip2_module — the kit reads its variables
+# rather than parsing the .mmdb itself.
+# geoip2 /usr/share/GeoIP/GeoLite2-Country.mmdb { $geoip2_country_code country iso_code; }
+# geoip2 /usr/share/GeoIP/GeoLite2-ASN.mmdb     { $geoip2_asn autonomous_system_number; }
+
+server {
+    listen 80;
+    server_name example.internal;
+
+    # Default off, so a Lua error can never accidentally enable mirroring.
+    set $dc_mirror 0;
+
+    access_by_lua_block {
+        -- Cheapest checks first: a denied country never pays for the rest.
+        waf.geo.check(nil, {
+            deny_countries = { "XX" },
+            allow_cidrs    = { "10.0.0.0/8" },   -- always wins, so monitoring never locks itself out
+        })
+
+        waf.ratelimit.limit({
+            dict     = "waf_ratelimit",
+            algo     = "token-bucket",           -- as in the /ratelimit visualiser
+            rate     = 10,                       -- refill per second
+            capacity = 20,                       -- burst
+        })
+
+        -- Scores and logs; flip log_only when you trust the threshold.
+        waf.bots.score({ threshold = 0.6, log_only = true })
+
+        -- Edge auth for protected paths:
+        -- waf.jwt.require_token({
+        --     algorithms = { RS256 = true },
+        --     jwks       = "https://issuer/.well-known/jwks.json",
+        --     issuer     = "https://issuer",
+        --     audience   = "api",
+        -- })
+
+        -- Shadow traffic: reads only, 1% sampled, kill switch honoured.
+        waf.mirror.decide({
+            sample_rate = 0.01,
+            kill_dict   = "waf_kill",
+            kill_file   = "/etc/dark-canary/kill",
+        })
+    }
+
+    # Capture the response for the diff engine. Both blocks are no-ops unless
+    # decide() chose to mirror this request.
+    body_filter_by_lua_block { waf.mirror.body_filter({ max_body = 65536 }) }
+    log_by_lua_block {
+        waf.mirror.log({ collector = { host = "127.0.0.1", port = 8099, path = "/captures" } })
+    }
+
+    location / {
+        mirror     /_shadow;
+        mirror_request_body off;      # reads only: no body needs to reach the shadow
+        proxy_pass http://upstream;
+    }
+
+    # nginx subrequests the mirror unconditionally, so the gate lives here.
+    location = /_shadow {
+        internal;
+        if ($dc_mirror = 0) { return 204; }
+        proxy_pass http://shadow;
+        proxy_set_header X-Dark-Canary-Path shadow;
+    }
+}
