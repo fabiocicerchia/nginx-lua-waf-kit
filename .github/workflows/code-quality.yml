@@ -33,3 +33,16 @@ jobs:
           python-version: "3.x"
       - name: pre-commit
         uses: pre-commit/action@v3.0.1
+
+  # The kit's logic is pure Lua, so the suite runs on any 5.1+ interpreter —
+  # no nginx, no resty, no container needed.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Lua
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends lua5.1
+      - name: Run the test suite
+        run: lua5.1 test/run.lua

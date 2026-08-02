@@ -1,0 +1,11 @@
+# gandalf config for nginx-lua-waf-kit.
+#
+# This is a pure-Lua repo. gandalf tags it "python" because docs/requirements.txt
+# exists (mkdocs deps for readthedocs), which switches on the Python-only gates.
+# They have nothing to scan here, so skip them rather than let them redden a run:
+#
+#   tests    — runs pytest; the real suite is `make test` (test/run.lua), wired
+#              into CI in .github/workflows/code-quality.yml
+#   atheris  — wants a Python fuzz harness at tests/fuzz/fuzz_adapters.py
+[gandalf]
+skip = ["tests", "atheris"]

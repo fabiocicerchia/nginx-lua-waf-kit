@@ -2,3 +2,8 @@
 .DS_Store
 reports/
 site/
+
+# gandalf generated output
+.gandalf-baseline.json
+.gandalf-cache.json
+.gandalf-trend.jsonl

@@ -1,5 +1,7 @@
 site_name: nginx-lua-waf-kit
-site_description: Opt-in Lua modules for the nginx-lua image: rate limiting, bot scoring, edge JWT, geo/ASN policy and request mirroring.
+site_description: >-
+  Opt-in Lua modules for the nginx-lua image: rate limiting, bot scoring,
+  edge JWT, geo/ASN policy and request mirroring.
 repo_url: https://github.com/fabiocicerchia/nginx-lua-waf-kit
 docs_dir: docs
 
