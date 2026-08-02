@@ -143,8 +143,11 @@ local function decode(raw)
     for t in raw:sub(3):gmatch("[^,]+") do log[#log + 1] = tonumber(t) end
     return { log = log }
   end
+  -- Trailing separator + an anchored capture: "[^|]*" alone also matches the
+  -- empty string between two "|", which shifts every field one slot and decodes
+  -- the whole state as nil — i.e. a full bucket on every request.
   local fields = {}
-  for f in raw:gmatch("[^|]*") do fields[#fields + 1] = f end
+  for f in (raw .. "|"):gmatch("([^|]*)|") do fields[#fields + 1] = f end
   return {
     tokens = tonumber(fields[2]), level = tonumber(fields[3]), at = tonumber(fields[4]),
     start = tonumber(fields[5]), count = tonumber(fields[6]), prev = tonumber(fields[7]),
