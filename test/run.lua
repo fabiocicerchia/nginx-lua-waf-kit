@@ -471,6 +471,264 @@ test("an asymmetric token fails closed when the verifier is unavailable", functi
   check(payload == nil, "an unverifiable token must be rejected, never passed through")
 end)
 
+-- --------------------------------------------------------- jwt: JWKS + entry --
+
+-- A deterministic stand-in for resty.sha256. It is not SHA-256 and is not meant
+-- to be: hmac_sha256's construction is checked above against the RFC, so what is
+-- left to test is that validate() wires parse → algorithm → verify → claims
+-- together, and that needs a hash that is reproducible, not a real one.
+local function fake_sha256_module()
+  return {
+    new = function()
+      local buf = {}
+      return {
+        update = function(_, s) buf[#buf + 1] = s return true end,
+        final = function()
+          local joined = table.concat(buf)
+          local out, acc = {}, #joined + 7
+          for i = 1, 32 do
+            local b = joined:byte((i - 1) % (#joined > 0 and #joined or 1) + 1) or 0
+            acc = (acc * 31 + b + i) % 251
+            out[i] = string.char(acc)
+          end
+          return table.concat(out)
+        end,
+        reset = function() buf = {} end,
+      }
+    end,
+  }
+end
+
+-- Builds a token this deployment should actually accept.
+local function hs256_token(secret, header_json, payload_json, sha)
+  local signing_input = b64url(header_json) .. "." .. b64url(payload_json)
+  local sig = jwt.hmac_sha256(secret, signing_input, function() return sha:new() end)
+  return signing_input .. "." .. b64url(sig), signing_input
+end
+
+test("a correctly signed HS256 token validates end to end", function()
+  _G.ngx = mock.new()
+  ngx.set_now(1000)
+  package.loaded["cjson.safe"] = { decode = fake_json, encode = function() return "{}" end }
+  local sha = fake_sha256_module()
+  package.loaded["resty.sha256"] = sha
+
+  local token, signing_input =
+    hs256_token("s3cret", '{"alg":"HS256"}', '{"sub":"u1","iss":"https://issuer"}', sha)
+
+  local claims, err = jwt.validate(token, {
+    algorithms = { HS256 = true }, secret = "s3cret", issuer = "https://issuer",
+  })
+  check(claims, "a correctly signed token must validate: " .. tostring(err))
+  eq(claims.sub, "u1", "and return the claims it verified")
+
+  -- The failure paths above prove alg:none dies; this proves the signature is
+  -- actually compared, not just parsed.
+  local tampered = signing_input .. "." .. b64url("not the real signature!!")
+  check(jwt.validate(tampered, { algorithms = { HS256 = true }, secret = "s3cret" }) == nil,
+    "a tampered signature must not validate")
+  check(jwt.validate(token, { algorithms = { HS256 = true }, secret = "wrong" }) == nil,
+    "and the secret must be the right one")
+  check(jwt.validate(token, { algorithms = { HS256 = true } }) == nil,
+    "HS256 with no secret configured fails closed rather than skipping the check")
+end)
+
+test("jwks_key selects by kid and one fetch serves every worker", function()
+  _G.ngx = mock.new()
+  package.loaded["cjson.safe"] = {
+    decode = function(s)
+      if s ~= "JWKS" then return nil end
+      return { keys = { { kid = "k1" }, { kid = "k2" } } }
+    end,
+    encode = function(k) return "key:" .. tostring(k.kid) end,
+  }
+
+  local fetches, real_fetch = 0, jwt.fetch
+  jwt.fetch = function() fetches = fetches + 1 return "JWKS" end
+
+  local o = { jwks = "https://issuer/jwks", jwks_dict = "waf_jwks", jwks_ttl = 60 }
+  eq(jwt.jwks_key(o, "k2"), "key:k2", "the kid picks the key, not the order")
+  eq(jwt.jwks_key(o, "k1"), "key:k1")
+  eq(fetches, 1, "the second lookup came from the shared dict, not the network")
+
+  local key, err = jwt.jwks_key(o, "unknown-kid")
+  check(key == nil, "an unknown kid must not fall back to some other key")
+  check(err:find("no key matching kid"), tostring(err))
+
+  jwt.fetch = real_fetch
+end)
+
+test("jwks_key fails closed when there is no usable key", function()
+  _G.ngx = mock.new()
+  package.loaded["cjson.safe"] = { decode = function() return nil end, encode = function() return "{}" end }
+
+  local _, err = jwt.jwks_key({ jwks = nil }, "k1")
+  check(err:find("no JWKS configured"), tostring(err))
+
+  local real_fetch = jwt.fetch
+  local o = { jwks = "https://issuer/jwks", jwks_dict = "waf_jwks", jwks_ttl = 60 }
+
+  jwt.fetch = function() return nil, "connection refused" end
+  local k2, e2 = jwt.jwks_key(o, "k1")
+  check(k2 == nil and e2:find("fetch failed"), tostring(e2))
+
+  jwt.fetch = function() return "garbage" end
+  local k3, e3 = jwt.jwks_key(o, "k1")
+  check(k3 == nil and e3:find("malformed JWKS"), tostring(e3))
+
+  jwt.fetch = real_fetch
+end)
+
+test("require_token forwards a verified subject and 401s everything else", function()
+  _G.ngx = mock.new()
+  ngx.set_now(1000)
+  package.loaded["cjson.safe"] = { decode = fake_json, encode = function() return "{}" end }
+  local sha = fake_sha256_module()
+  package.loaded["resty.sha256"] = sha
+
+  local token = hs256_token("s3cret", '{"alg":"HS256"}', '{"sub":"u1"}', sha)
+  local o = { algorithms = { HS256 = true }, secret = "s3cret" }
+
+  ngx.var.http_authorization = "Bearer " .. token
+  check(jwt.require_token(o), "a valid token must reach the upstream")
+  eq(ngx.ctx.jwt.sub, "u1", "the claims are published for later phases")
+  eq(ngx.req.set_headers["X-Auth-Sub"], "u1", "and the subject is forwarded upstream")
+  check(ngx.exited == nil, "a valid token must not exit")
+
+  _G.ngx = mock.new()
+  ngx.var.http_authorization = "Bearer garbage"
+  jwt.require_token(o)
+  eq(ngx.exited, 401, "an invalid token is rejected at the edge")
+  check(ngx.header["WWW-Authenticate"]:find("invalid_token"), "with the RFC 6750 challenge")
+  check(#ngx.logs > 0, "and a log line saying why")
+
+  _G.ngx = mock.new()
+  jwt.require_token(o)
+  eq(ngx.exited, 401, "no Authorization header at all is a 401, not a pass")
+  check(ngx.req.set_headers["X-Auth-Sub"] == nil, "and nothing is forwarded upstream")
+end)
+
+-- ------------------------------------------------------- mirror: scrub + ship --
+
+test("query-string secrets are redacted, and only the ones named", function()
+  local scrub = { token = true, password = true }
+  eq(mirror.scrub_query("/a?token=abc&user=bob", scrub), "/a?token=[redacted]&user=bob")
+  eq(mirror.scrub_query("/a?user=bob&token=abc", scrub), "/a?user=bob&token=[redacted]",
+    "position in the query string must not matter")
+  eq(mirror.scrub_query("/a?TOKEN=abc", scrub), "/a?TOKEN=[redacted]",
+    "a secret does not stop being one because the client shouted it")
+  eq(mirror.scrub_query("/a?token=abc&password=p&x=1", scrub), "/a?token=[redacted]&password=[redacted]&x=1")
+  eq(mirror.scrub_query("/a", scrub), "/a", "no query string is not an error")
+  check(mirror.scrub_query(nil, scrub) == nil)
+end)
+
+test("named JSON body fields are redacted before a capture leaves the edge", function()
+  local body = '{"user":"bob","password":"hunter2","note":"ok"}'
+  local out = mirror.scrub_body(body, { "password" })
+  check(not out:find("hunter2"), "the secret must be gone: " .. out)
+  check(out:find('"user":"bob"'), "and everything else left alone: " .. out)
+  eq(mirror.scrub_body('{"a":"1"}', {}), '{"a":"1"}', "no fields configured, nothing redacted")
+  eq(mirror.scrub_body("", { "password" }), "")
+  check(mirror.scrub_body(nil, { "password" }) == nil)
+end)
+
+test("capture() scrubs headers, query and body together", function()
+  _G.ngx = mock.new({
+    headers = { Authorization = "Bearer secret", Accept = "*/*" },
+    resp_headers = { ["Set-Cookie"] = "sid=1" },
+  })
+  ngx.var.request_uri = "/pay?token=abc&id=7"
+  ngx.status = 201
+  ngx.ctx.dc_mirror = true
+  ngx.ctx.dc_correl_id = "cid-1"
+  ngx.ctx.dc_body = { '{"password":"hunter2"}' }
+
+  local cap = mirror.capture({ scrub_fields = { "password" } })
+  eq(cap.correl_id, "cid-1", "the capture is pairable with the primary request")
+  eq(cap.status, 201)
+  eq(cap.req_headers.Authorization, mirror.REDACTED)
+  eq(cap.req_headers.Accept, "*/*")
+  eq(cap.res_headers["Set-Cookie"], mirror.REDACTED, "response headers leak sessions too")
+  eq(cap.uri, "/pay?token=[redacted]&id=7")
+  check(not cap.body:find("hunter2"), "the body is scrubbed on the way out: " .. cap.body)
+  eq(cap.truncated, false)
+end)
+
+test("capture() produces nothing for a request that was never mirrored", function()
+  _G.ngx = mock.new()
+  ngx.ctx.dc_mirror = false
+  check(mirror.capture({}) == nil, "no decision, no capture, no data leaving the edge")
+end)
+
+test("ship() hands off to a timer instead of blocking the response", function()
+  _G.ngx = mock.new()
+  local encoded
+  package.loaded["cjson.safe"] = {
+    encode = function(t) encoded = t return '{"correl_id":"cid-1"}' end,
+    decode = function() return nil end,
+  }
+
+  mirror.ship({ correl_id = "cid-1" }, { host = "127.0.0.1", port = 9999 })
+  eq(#ngx.timer.queued, 1, "the POST happens after the response, not during it")
+  eq(encoded.correl_id, "cid-1")
+
+  mirror.ship(nil, { host = "h", port = 1 })
+  mirror.ship({ correl_id = "x" }, nil)
+  eq(#ngx.timer.queued, 1, "nothing to ship, or nowhere to ship it, queues nothing")
+end)
+
+-- ------------------------------------------------------- enforcement entries --
+--
+-- Everything above tests what the modules decide. These test what actually
+-- happens to a request: the status, the headers, and whether ngx.exit is called
+-- at all — which is the part an operator finds out about in production.
+
+test("limit() sets the rate-limit headers and rejects with the configured status", function()
+  _G.ngx = mock.new()
+  ngx.var.remote_addr = "10.0.0.9"
+  local o = { algo = "token-bucket", capacity = 1, rate = 1, window = 1, key = "lim" }
+
+  check(ratelimit.limit(o) == true, "the first request is admitted")
+  eq(ngx.header["X-RateLimit-Remaining"], 0, "and told what is left")
+  check(ngx.exited == nil, "an admitted request must not exit")
+
+  ratelimit.limit(o)
+  eq(ngx.exited, 429, "the second request is rejected with the configured status")
+  eq(ngx.header["Retry-After"], 1, "and told when to come back, as whole seconds")
+end)
+
+test("log_only rolls the limiter out without rejecting anyone", function()
+  _G.ngx = mock.new()
+  ngx.var.remote_addr = "10.0.0.9"
+  local o = { algo = "token-bucket", capacity = 1, rate = 1, window = 1, key = "lo", log_only = true }
+
+  ratelimit.limit(o)
+  check(ratelimit.limit(o) == true, "over the limit, but log_only still admits")
+  check(ngx.exited == nil, "log_only must never exit — that is the whole point of it")
+  check(#ngx.logs > 0, "but it must record what it would have done")
+end)
+
+test("geo check() exits with the configured status and records the reason", function()
+  _G.ngx = mock.new()
+  ngx.var.remote_addr = "1.2.3.4"
+  ngx.var.geoip2_country_code = "RU"
+
+  check(geo.check(nil, { deny_countries = { "KP" } }), "a country not on the deny list passes")
+  eq(ngx.ctx.geo_reason, "default")
+
+  geo.check(nil, { deny_countries = { "RU" } })
+  eq(ngx.exited, 403, "a denied country gets the configured status")
+  check(ngx.ctx.geo_reason:find("RU"), "and the reason is left for the log phase")
+  check(#ngx.logs > 0, "and it is logged at the edge")
+
+  _G.ngx = mock.new()
+  ngx.var.remote_addr = "1.2.3.4"
+  ngx.var.geoip2_country_code = "RU"
+  check(geo.check(nil, { deny_countries = { "RU" }, log_only = true }),
+    "log_only admits what it would otherwise deny")
+  check(ngx.exited == nil, "and never exits")
+end)
+
 -- ------------------------------------------------------------------ summary --
 
 io.write(string.format("\n%d passed, %d failed\n", passed, failed))
