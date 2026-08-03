@@ -94,5 +94,4 @@ never a public issue — see [SECURITY.md](SECURITY.md).
 
 ## License
 
-Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) and
-[NOTICE](NOTICE).
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE).
