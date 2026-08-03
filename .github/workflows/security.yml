@@ -8,6 +8,7 @@ on:
     - cron: "0 6 * * 1" # weekly, catches newly disclosed CVEs
 
 permissions:
+  pull-requests: read # gitleaks reads PR commits
   contents: read
   security-events: write # upload SARIF to the Security tab
 
@@ -37,6 +38,8 @@ jobs:
           output: trivy.sarif
           severity: CRITICAL,HIGH
       - name: Upload SARIF
+        # GitHub Advanced Security is required for this on private repos; skip instead of failing red.
+        if: ${{ !github.event.repository.private }}
         uses: github/codeql-action/upload-sarif@v4.37.4
         with:
           sarif_file: trivy.sarif
