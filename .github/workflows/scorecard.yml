@@ -15,6 +15,8 @@ permissions: read-all
 
 jobs:
   analysis:
+    # GitHub Advanced Security is required for this on private repos; skip instead of failing red.
+    if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     permissions:
       security-events: write # upload SARIF

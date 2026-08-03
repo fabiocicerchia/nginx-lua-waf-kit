@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   review:
+    # GitHub Advanced Security is required for this on private repos; skip instead of failing red.
+    if: ${{ !github.event.repository.private }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
