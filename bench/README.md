@@ -48,5 +48,3 @@ returning a 429.
   request within the window, so size it from `capacity × clients`.
 - The mirrored subrequest's own cost, measured separately — the `mirror` row
   above measures the decision, not the shadow traffic it generates.
-
-See `../../ROADMAP.md`.
