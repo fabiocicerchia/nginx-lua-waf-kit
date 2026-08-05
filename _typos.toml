@@ -1,0 +1,7 @@
+# Domain vocabulary the typos dictionary mistakes for misspellings.
+
+[default.extend-words]
+# wrk: the HTTP benchmarking tool the bench harness drives.
+wrk = "wrk"
+# abd: hex fragment inside fixture request ids.
+abd = "abd"
