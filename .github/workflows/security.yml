@@ -8,6 +8,7 @@ on:
     - cron: "0 6 * * 1" # weekly, catches newly disclosed CVEs
 
 permissions:
+  pull-requests: read # gitleaks reads PR commits
   contents: read
   security-events: write # upload SARIF to the Security tab
 
