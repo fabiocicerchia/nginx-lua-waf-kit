@@ -5,6 +5,16 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.0.0 (2026-08-05)
+
+
+### Bug Fixes
+
+* **ci:** stop security workflows failing on private repos ([#2](https://github.com/fabiocicerchia/nginx-lua-waf-kit/issues/2)) ([c5f16b5](https://github.com/fabiocicerchia/nginx-lua-waf-kit/commit/c5f16b58d5b81c4f5306bf0d1fd1a8df3fb7c8fc))
+* **pre-commit:** stop check-yaml failing on Helm templates and multi-doc manifests ([25be2b1](https://github.com/fabiocicerchia/nginx-lua-waf-kit/commit/25be2b15e6cd6302eb9586bc6ae8eff7a1c4a5c9))
+* **ratelimit:** decode shared-dict state correctly ([cbaf05f](https://github.com/fabiocicerchia/nginx-lua-waf-kit/commit/cbaf05fd21df21d791c45bc76697d944b80337ad))
+* **security:** skip the SARIF upload on private repos ([9258635](https://github.com/fabiocicerchia/nginx-lua-waf-kit/commit/9258635c11f529bc5991ef13e36abab50c9a53de))
+
 ## [Unreleased]
 
 ### Added
