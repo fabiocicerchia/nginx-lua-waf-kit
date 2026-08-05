@@ -1,0 +1,28 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Lint and secret scanning live in code-quality.yml and security.yml.
+# This workflow runs the tests — without it nothing here proves they pass.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Install Lua
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends lua5.4
+
+      - name: Test
+        run: make test
