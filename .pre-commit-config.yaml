@@ -52,3 +52,14 @@ repos:
         # warning and above. The style/info notes are mostly SC1091 (a sourced
         # file the linter cannot see), which is noise in a repo of small scripts.
         args: [--severity=warning]
+
+  # luacheck from its published image: pre-commit's own `language: lua` needs
+  # luarocks on the runner, and the quality job only has Python. Globals for the
+  # host (ngx, core) are declared in .luacheckrc.
+  - repo: local
+    hooks:
+      - id: luacheck
+        name: luacheck
+        language: docker_image
+        entry: pipelinecomponents/luacheck@sha256:29b50ed2cb99e4eea19522f0c9b3b104661437e0b5158921df2d111eb6c5af2e luacheck
+        types: [lua]
