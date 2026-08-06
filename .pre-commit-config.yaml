@@ -63,3 +63,11 @@ repos:
         language: docker_image
         entry: pipelinecomponents/luacheck@sha256:29b50ed2cb99e4eea19522f0c9b3b104661437e0b5158921df2d111eb6c5af2e luacheck
         types: [lua]
+
+  # Flags energy-wasteful patterns (busy loops, every-minute crons, SELECT *,
+  # unpinned full-fat base images, missing k8s resource limits, ...). Gating in
+  # CI too: code-quality.yml runs this file via pre-commit/action.
+  - repo: https://github.com/fabiocicerchia/greenlint
+    rev: c678d3ef9e9e4ce5a5ab234d7833ffabc5c37ab1  # v0.1.0 + the false-positive fixes
+    hooks:
+      - id: greenlint
