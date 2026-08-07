@@ -5,9 +5,8 @@ help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 	  awk 'BEGIN {FS = ":.*?## "}; {printf "  %-10s %s\n", $$1, $$2}'
 
-setup: ## Install git hooks and dev tooling
-	git config core.hooksPath .githooks
-	@command -v pre-commit >/dev/null 2>&1 && pre-commit install || true
+setup: ## Install the pre-commit hook
+	pre-commit install
 
 lint: ## Run all pre-commit checks on the whole tree
 	pre-commit run --all-files
