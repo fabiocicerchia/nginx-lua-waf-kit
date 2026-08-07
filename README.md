@@ -4,6 +4,7 @@
 [![Security](https://github.com/fabiocicerchia/nginx-lua-waf-kit/actions/workflows/security.yml/badge.svg)](https://github.com/fabiocicerchia/nginx-lua-waf-kit/actions/workflows/security.yml)
 [![License](https://img.shields.io/badge/license-Apache_2.0-blue.svg)](LICENSE)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/fabiocicerchia/nginx-lua-waf-kit/badge)](https://securityscorecards.dev/viewer/?uri=github.com/fabiocicerchia/nginx-lua-waf-kit)
+[![CI carbon](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/fabiocicerchia/nginx-lua-waf-kit/gh-pages/badge.json)](.github/workflows/carbon-badge.yml)
 
 An opt-in Lua module set for the existing nginx-lua image — **a kit, not a WAF
 product**. Versioned tag-for-tag against nginx-lua releases so existing users
