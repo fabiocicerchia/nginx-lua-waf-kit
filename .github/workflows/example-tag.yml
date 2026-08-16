@@ -28,9 +28,10 @@ jobs:
   tag:
     runs-on: ubuntu-latest
     steps:
+      # Shallow: this tags the commit it is running on and pushes the tag.
+      # It never walks history, and a full clone of it is the waste greenlint's
+      # GL004 exists to catch.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
 
       - name: Read the declared runtime
         id: compat
