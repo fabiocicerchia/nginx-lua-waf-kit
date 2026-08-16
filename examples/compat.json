@@ -1,0 +1,6 @@
+{
+  "_comment": "Which nginx-lua release these examples are written against. The tag examples/nginx-lua-<nginx_lua> points at the commit that carries them, so a reader can check out the set that matches their runtime instead of hoping the tip still does. # VERSION-BUMP",
+  "nginx_lua": "v1.31.2",
+  "kit": "1.0.1",
+  "verified_on": "2026-08-16"
+}
