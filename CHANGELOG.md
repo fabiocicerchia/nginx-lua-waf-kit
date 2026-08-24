@@ -5,6 +5,13 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0](https://github.com/fabiocicerchia/nginx-lua-waf-kit/compare/v1.0.1...v1.1.0) (2026-08-24)
+
+
+### Features
+
+* **examples:** tag each example config set against its nginx-lua release ([#17](https://github.com/fabiocicerchia/nginx-lua-waf-kit/issues/17)) ([558b267](https://github.com/fabiocicerchia/nginx-lua-waf-kit/commit/558b26752af59fda9ab28d5b64576e3fe00a4de9))
+
 ## [1.0.1](https://github.com/fabiocicerchia/nginx-lua-waf-kit/compare/v1.0.0...v1.0.1) (2026-08-13)
 
 
