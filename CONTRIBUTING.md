@@ -26,6 +26,13 @@ version bump: `fix:` → patch, `feat:` → minor, `feat!:` or a
 
 ## Releases
 
+**An nginx-lua release needs a matching example tag.** When these examples are
+updated for a new runtime, bump `nginx_lua` in `examples/compat.json` in the
+same change: pushing that to `main` moves `examples/nginx-lua-<release>` to the
+commit carrying them. Without it, a reader on that release has no set to check
+out and will copy from `main`, which may target a different runtime.
+
+
 Releases are automated by [release-please](.github/workflows/release.yml);
 you don't tag or edit the changelog manually.
 

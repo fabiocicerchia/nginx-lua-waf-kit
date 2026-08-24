@@ -51,6 +51,25 @@ init_by_lua_block {
 
 Full docs live in [`docs/`](docs/). Runnable examples live in [`examples/`](examples/).
 
+### Which examples match your runtime
+
+The examples are configuration for **nginx-lua**, so the tip of `main` is not an
+answer to "which version is this for". Each set is tagged against the release it
+was written for:
+
+```sh
+git checkout examples/nginx-lua-v1.31.2   # the set for nginx-lua v1.31.2
+```
+
+`examples/compat.json` says which release the current examples target
+(`v1.31.2` today). If your runtime is older, check out that release's tag rather
+than copying from `main` — a config that silently mismatches the runtime is the
+failure this scheme exists to prevent, and it usually surfaces as a module that
+loads and then does nothing.
+
+The tag is **moved** when the examples change while still targeting the same
+runtime, so it always points at the newest set that works with that version.
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md). Security issues go through

@@ -1,0 +1,70 @@
+name: example config tag
+
+# The examples are copy-pasteable configuration for a *different* project's
+# runtime, so "the tip of main" is not an answer to "which version is this
+# for". A reader on nginx-lua v1.30.3 needs the examples as they were when they
+# targeted v1.30.3, and a tag is the only thing that survives the next edit.
+#
+# Scheme: examples/nginx-lua-<release>, e.g. examples/nginx-lua-v1.31.2.
+# One tag per nginx-lua release that this kit's examples have been written
+# against — not one per commit, and not one per kit release, because the thing
+# a reader is matching is their runtime.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "examples/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write # creates the tag
+
+concurrency:
+  group: example-tag
+  cancel-in-progress: false
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      # Shallow: this tags the commit it is running on and pushes the tag.
+      # It never walks history, and a full clone of it is the waste greenlint's
+      # GL004 exists to catch.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Read the declared runtime
+        id: compat
+        run: |
+          version=$(jq -r '.nginx_lua' examples/compat.json)
+          if [ -z "$version" ] || [ "$version" = "null" ]; then
+            echo "examples/compat.json does not name an nginx-lua release" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=examples/nginx-lua-$version" >> "$GITHUB_OUTPUT"
+
+      # A typo here would produce a tag pointing at a runtime that does not
+      # exist, which is worse than no tag: it looks checkable and is not.
+      - name: Check the release exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.compat.outputs.version }}
+        run: |
+          if ! gh release view "$VERSION" -R fabiocicerchia/nginx-lua >/dev/null 2>&1; then
+            echo "nginx-lua has no release $VERSION — fix examples/compat.json" >&2
+            exit 1
+          fi
+
+      # Moved deliberately, not created once: when the examples change while
+      # still targeting the same runtime, the tag should point at the current
+      # set. A reader wants the newest examples that work with their version.
+      - name: Tag this commit
+        env:
+          TAG: ${{ steps.compat.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -f "$TAG"
+          git push -f origin "$TAG"
+          echo "tagged $(git rev-parse --short HEAD) as $TAG"
