@@ -1,7 +1,7 @@
 # gandalf config for nginx-lua-waf-kit.
 #
 # This is a pure-Lua repo. gandalf tags it "python" because docs/requirements.txt
-# exists (mkdocs deps for readthedocs), which switches on the Python-only gates.
+# exists (mkdocs deps for the docs site), which switches on the Python-only gates.
 # They have nothing to scan here, so skip them rather than let them redden a run:
 #
 #   tests    — runs pytest; the real suite is `make test` (test/run.lua), wired
