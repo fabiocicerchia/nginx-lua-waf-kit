@@ -71,6 +71,53 @@ function _M.order_penalty(order, expected)
   return inversions / checked
 end
 
+-- --- signals -----------------------------------------------------------------
+--
+-- One per signal in the header comment, each a pure (req, headers, ua) and each
+-- returning its points and the reason that earned them — or nothing when the
+-- signal does not fire. The weight lives at its single use because it is only
+-- meaningful next to the thing it weighs; SIGNALS below is the whole policy,
+-- and its order is the order the reasons come back in.
+
+local function user_agent_signal(_, _, ua)
+  if not ua or ua == "" then return 0.35, "no user agent" end
+  local hit = contains_any(ua, SELF_IDENTIFYING)
+  if hit then return 0.5, "self-identifying client: " .. hit end
+end
+
+local function missing_header_signal(_, headers, _)
+  local missing = {}
+  for _, name in ipairs(EXPECTED) do
+    if not headers[name] then missing[#missing + 1] = name end
+  end
+  if #missing > 0 then
+    return 0.15 * #missing, "missing " .. table.concat(missing, ", ")
+  end
+end
+
+local function header_order_signal(req, _, _)
+  if not req.order then return end
+  local penalty = _M.order_penalty(req.order, BROWSER_ORDER)
+  if penalty > 0 then return 0.3 * penalty, "unusual header order" end
+end
+
+-- The strongest signal available when the build provides a JA3: a TLS stack
+-- that does not match the browser the UA claims to be.
+local function tls_fingerprint_signal(req, _, ua)
+  if not req.ja3_family or not ua then return end
+  local claims_browser = contains_any(ua, { "chrome", "firefox", "safari", "edge" })
+  if claims_browser and req.ja3_family ~= "browser" then
+    return 0.5, "TLS fingerprint (" .. req.ja3_family .. ") contradicts the user agent"
+  end
+end
+
+local SIGNALS = {
+  user_agent_signal,
+  missing_header_signal,
+  header_order_signal,
+  tls_fingerprint_signal,
+}
+
 -- Pure: everything the scorer needs is passed in. `req` is
 -- { headers = {...}, order = {...}, ja3_family = "..." }.
 function _M.score_request(req, opts)
@@ -83,37 +130,11 @@ function _M.score_request(req, opts)
   end
 
   local score, reasons = 0, {}
-  local function add(points, reason)
-    score = score + points
-    reasons[#reasons + 1] = reason
-  end
-
-  if not ua or ua == "" then
-    add(0.35, "no user agent")
-  else
-    local hit = contains_any(ua, SELF_IDENTIFYING)
-    if hit then add(0.5, "self-identifying client: " .. hit) end
-  end
-
-  local missing = {}
-  for _, name in ipairs(EXPECTED) do
-    if not headers[name] then missing[#missing + 1] = name end
-  end
-  if #missing > 0 then
-    add(0.15 * #missing, "missing " .. table.concat(missing, ", "))
-  end
-
-  if req.order then
-    local penalty = _M.order_penalty(req.order, BROWSER_ORDER)
-    if penalty > 0 then add(0.3 * penalty, "unusual header order") end
-  end
-
-  -- The strongest signal available when the build provides a JA3: a TLS stack
-  -- that does not match the browser the UA claims to be.
-  if req.ja3_family and ua then
-    local claims_browser = contains_any(ua, { "chrome", "firefox", "safari", "edge" })
-    if claims_browser and req.ja3_family ~= "browser" then
-      add(0.5, "TLS fingerprint (" .. req.ja3_family .. ") contradicts the user agent")
+  for _, signal in ipairs(SIGNALS) do
+    local points, reason = signal(req, headers, ua)
+    if points then
+      score = score + points
+      reasons[#reasons + 1] = reason
     end
   end
 
