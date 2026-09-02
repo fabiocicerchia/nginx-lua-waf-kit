@@ -72,6 +72,30 @@ local function listed(value, list)
   return nil
 end
 
+-- Country and ASN are the same rule with a different label, and they have to
+-- stay that way: an allowlist that behaved differently from the other would be
+-- a policy an operator cannot reason about. Present allowlist decides alone;
+-- otherwise the denylist gets a veto and anything else falls through.
+--
+-- Returns allowed, reason — or nothing at all when neither list applies. Every
+-- decision carries a reason, so the reason is what "decided" means here.
+local function list_decision(label, value, allow_list, deny_list, default_allow)
+  if allow_list then
+    if listed(value, allow_list) then
+      return true, "allow " .. label .. " " .. tostring(value)
+    end
+    -- An allowlist that cannot see the value would deny everything on a
+    -- missing database, so say which it is.
+    if not value or value == "" then
+      return default_allow, label .. " unknown (geoip2 variable unset)"
+    end
+    return false, label .. " " .. tostring(value) .. " not on the allowlist"
+  end
+  if listed(value, deny_list) then
+    return false, "deny " .. label .. " " .. tostring(value)
+  end
+end
+
 -- Pure decision. Returns allowed, reason.
 function _M.decide(ip, country, asn, rules)
   local hit = any_cidr(ip, rules.allow_cidrs)
@@ -79,33 +103,13 @@ function _M.decide(ip, country, asn, rules)
   hit = any_cidr(ip, rules.deny_cidrs)
   if hit then return false, "deny cidr " .. hit end
 
-  if rules.allow_countries then
-    if listed(country, rules.allow_countries) then
-      return true, "allow country " .. tostring(country)
-    end
-    -- An allowlist that cannot see the country would deny everything on a
-    -- missing database, so say which it is.
-    if not country or country == "" then
-      return rules.default_allow, "country unknown (geoip2 variable unset)"
-    end
-    return false, "country " .. tostring(country) .. " not on the allowlist"
-  end
-  if listed(country, rules.deny_countries) then
-    return false, "deny country " .. tostring(country)
-  end
+  local allowed, reason =
+    list_decision("country", country, rules.allow_countries, rules.deny_countries, rules.default_allow)
+  if reason then return allowed, reason end
 
-  if rules.allow_asns then
-    if listed(asn, rules.allow_asns) then
-      return true, "allow ASN " .. tostring(asn)
-    end
-    if not asn or asn == "" then
-      return rules.default_allow, "ASN unknown (geoip2 variable unset)"
-    end
-    return false, "ASN " .. tostring(asn) .. " not on the allowlist"
-  end
-  if listed(asn, rules.deny_asns) then
-    return false, "deny ASN " .. tostring(asn)
-  end
+  allowed, reason =
+    list_decision("ASN", asn, rules.allow_asns, rules.deny_asns, rules.default_allow)
+  if reason then return allowed, reason end
 
   return rules.default_allow, "default"
 end
