@@ -32,11 +32,11 @@ local DEFAULTS = {
 --
 -- Each returns: allowed, new_state, retry_after_seconds, remaining.
 
-local A = {}
+local ALGORITHMS = {}
 
 -- Classic token bucket: capacity tokens, refilled at `rate` per second.
 -- Absorbs bursts, which is usually what an API wants.
-A["token-bucket"] = function(state, now, o)
+ALGORITHMS["token-bucket"] = function(state, now, o)
   local tokens = state.tokens or o.capacity
   tokens = min(o.capacity, tokens + (now - (state.at or now)) * o.rate)
   if tokens >= 1 then
@@ -47,7 +47,7 @@ end
 
 -- Leaky bucket as a queue: the bucket drains at a constant `rate` and a request
 -- is admitted only if it fits. Smooths output instead of absorbing bursts.
-A["leaky-bucket"] = function(state, now, o)
+ALGORITHMS["leaky-bucket"] = function(state, now, o)
   local level = max(0, (state.level or 0) - (now - (state.at or now)) * o.rate)
   if level + 1 <= o.capacity then
     return true, { level = level + 1, at = now }, 0, floor(o.capacity - level - 1)
@@ -57,7 +57,7 @@ end
 
 -- Fixed window: cheapest, and the one with the boundary problem — up to 2×
 -- capacity can pass across a window edge. The visualiser shows exactly this.
-A["fixed-window"] = function(state, now, o)
+ALGORITHMS["fixed-window"] = function(state, now, o)
   local window_start = floor(now / o.window) * o.window
   local count = (state.start == window_start) and state.count or 0
   if count < o.capacity then
@@ -70,7 +70,7 @@ end
 -- The log is capped at `capacity` entries — beyond the limit the extra
 -- timestamps change no decision, and an uncapped log is a memory leak with a
 -- rate limiter attached.
-A["sliding-log"] = function(state, now, o)
+ALGORITHMS["sliding-log"] = function(state, now, o)
   local cutoff = now - o.window
   local kept = {}
   for _, t in ipairs(state.log or {}) do
@@ -85,7 +85,7 @@ end
 
 -- Sliding counter: the practical compromise. Two counters, with the previous
 -- window weighted by how much of it is still in view.
-A["sliding-counter"] = function(state, now, o)
+ALGORITHMS["sliding-counter"] = function(state, now, o)
   local window_start = floor(now / o.window) * o.window
   local cur, prev = 0, 0
   if state.start == window_start then
@@ -109,11 +109,11 @@ local ALIASES = {
   ["sliding-window-counter"] = "sliding-counter",
 }
 
-_M.algorithms = A
+_M.algorithms = ALGORITHMS
 
 function _M.step(state, now, o)
   local name = ALIASES[o.algo] or o.algo
-  local algo = A[name]
+  local algo = ALGORITHMS[name]
   if not algo then
     error("ratelimit: unknown algorithm '" .. tostring(o.algo) .. "'")
   end
