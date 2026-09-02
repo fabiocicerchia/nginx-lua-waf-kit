@@ -204,6 +204,12 @@ function _M.limit(opts)
     return true
   end
 
+  -- The other half of the contract. Without it `analyse.sh` can never report
+  -- that this module is enforcing: it counts `<module>: rejected ` lines to
+  -- warn when a supposedly log_only rollout is already turning traffic away,
+  -- and a limiter that rejects silently is the one case that check missed.
+  ngx.log(ngx.WARN, "ratelimit: rejected ", tostring(ngx.var.remote_addr),
+    ": over limit")
   ngx.header["Retry-After"] = ceil(retry_after)
   return ngx.exit(o.status)
 end

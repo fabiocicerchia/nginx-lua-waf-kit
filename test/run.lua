@@ -755,11 +755,20 @@ test("every enforcing module logs the same shape under log_only", function()
         ratelimit.limit(o)
         ratelimit.limit(o)
       end,
+      enforce = function()
+        local o = { algo = "token-bucket", capacity = 1, rate = 1, window = 1,
+                    key = "shape-enforced" }
+        ratelimit.limit(o)
+        ratelimit.limit(o)
+      end,
     },
     {
       name = "geo_asn",
       run = function()
         geo.check(nil, { deny_countries = { "RU" }, log_only = true })
+      end,
+      enforce = function()
+        geo.check(nil, { deny_countries = { "RU" } })
       end,
     },
     {
@@ -768,11 +777,20 @@ test("every enforcing module logs the same shape under log_only", function()
         ngx.req.headers = { ["user-agent"] = "curl/8.4.0", accept = "*/*" }
         bots.score({ threshold = 0, log_only = true })
       end,
+      -- log_only is explicit here because bot_heuristics DEFAULTS it to true
+      -- on purpose ("score first, enforce later"), unlike the other three.
+      enforce = function()
+        ngx.req.headers = { ["user-agent"] = "curl/8.4.0", accept = "*/*" }
+        bots.score({ threshold = 0, log_only = false })
+      end,
     },
     {
       name = "jwt",
       run = function()
         jwt.require_token({ secret = "s", log_only = true })
+      end,
+      enforce = function()
+        jwt.require_token({ secret = "s" })
       end,
     },
   }
@@ -789,6 +807,24 @@ test("every enforcing module logs the same shape under log_only", function()
         .. "be counted from these logs")
     check(logged("(log_only)"),
       c.name .. ": the line does not say it was log_only, so it reads as a real rejection")
+  end
+
+  -- The other half, which nothing checked for anything but geo_asn — and
+  -- ratelimit shipped without it. `analyse.sh` counts `<module>: rejected `
+  -- to warn that a supposedly log_only rollout is already turning traffic
+  -- away; a module that rejects silently is invisible to that warning, which
+  -- is the one failure the whole exercise is meant to catch.
+  for _, c in ipairs(cases) do
+    _G.ngx = mock.new()
+    ngx.var.remote_addr = "203.0.113.7"
+    ngx.var.geoip2_country_code = "RU"
+    ngx.var.http_user_agent = "curl/8.0"
+    c.enforce()
+    check(logged(c.name .. ": rejected "),
+      c.name .. ": enforced a rejection without logging `<module>: rejected ` — "
+        .. "analyse.sh cannot tell this rollout is no longer log_only")
+    check(logged("(log_only)") == nil,
+      c.name .. ": a real rejection must not be tagged (log_only)")
   end
 end)
 
