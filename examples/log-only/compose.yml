@@ -26,6 +26,16 @@ services:
       # the JWT row as anything.
       WAF_JWT_SECRET: "${WAF_JWT_SECRET:-not-a-real-secret-log-only}"
     restart: unless-stopped
+    # Bounded on purpose, and not just to satisfy a linter. This box is meant
+    # to be left running for a week with real traffic on it: the rate limiter's
+    # shared dict, the mirror module's in-flight subrequests and a week of logs
+    # all grow with traffic, and an unbounded container that takes the host with
+    # it ends the experiment in the most expensive way available. Compose v2
+    # form (`mem_limit`/`cpus`) rather than `deploy.resources` because this is
+    # `docker compose up`, not Swarm — `deploy` is ignored outside a stack.
+    # Raise them if your traffic slice warrants it; do not remove them.
+    mem_limit: 512m
+    cpus: 1.0
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/"]
       interval: 30s
