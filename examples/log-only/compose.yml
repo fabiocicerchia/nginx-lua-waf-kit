@@ -1,0 +1,33 @@
+# A live OpenResty with all five modules loaded and none of them enforcing.
+#
+# Point real traffic at :8080 — mirror some, or put it behind a load balancer
+# taking a slice — and leave it. `./analyse.sh` turns the logs into per-module
+# rates.
+#
+# The logs are bind-mounted rather than left in the container, because the whole
+# artefact of this deployment is a week of them and `docker compose down` should
+# not be the thing that ends the experiment.
+
+services:
+  waf:
+    # Pinned. A rollout measured against a moving image measures the image.
+    # VERSION-BUMP
+    image: openresty/openresty:1.27.1.2-0-alpine
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ../..:/kit:ro
+      - ./logs:/var/log/nginx
+    environment:
+      # Only used by the JWT module, and only to validate against — nothing is
+      # rejected, so a wrong value here shows up as a would-reject rate of
+      # ~100% rather than as an outage. Set it to the real one before reading
+      # the JWT row as anything.
+      WAF_JWT_SECRET: "${WAF_JWT_SECRET:-not-a-real-secret-log-only}"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3

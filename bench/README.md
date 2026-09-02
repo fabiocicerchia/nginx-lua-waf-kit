@@ -12,13 +12,35 @@ release blocker** — it is now one command away from being answered.
 ## Running it
 
 ```
-./run.sh                                   # openresty/openresty:alpine, 30s per scenario
+./run.sh                                   # openresty/openresty:alpine, 30s each
 IMAGE=your/nginx-lua:tag DURATION=60s ./run.sh
 ```
 
-Needs docker. Writes `results.md` with the image tag, host and load-generator
-settings baked in, so a number is never quotable without the conditions it was
-measured under.
+Needs docker. Writes `results.md` with everything needed to reproduce it or to
+distrust it:
+
+| recorded | why |
+| --- | --- |
+| image tag **and digest** | `openresty:alpine` is a moving tag; a latency figure attributed to the wrong build is worse than no figure |
+| `openresty -v` from the container that ran it | the build, not the tag |
+| kit revision | the module settings are in `bench/nginx.conf` at that commit, and they are part of the measurement |
+| CPU model, cores, kernel | "4 cores" on a shared runner and on bare metal are not the same measurement |
+| wrk threads, connections, duration | |
+| the exact command to re-run | so reproducing it is a copy-paste, not a reconstruction |
+
+### From CI, on demand
+
+`.github/workflows/bench.yml` runs the same script on a GitHub runner
+(`workflow_dispatch`, with the duration and load as inputs) and uploads
+`results.md` as an artefact.
+
+**Those numbers are not quotable, and the workflow staples that warning to the
+top of the file it produces** rather than leaving it in a README that whoever
+quotes a number will not have open. A shared runner is two cores, a hypervisor
+and neighbours. It is useful for spotting a **regression** between two runs on
+the same runner class, and useless for the absolute figures a reader would put
+in front of their own capacity planning — which is exactly what this directory
+exists to provide, and still does not.
 
 ## Method
 

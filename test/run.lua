@@ -729,6 +729,100 @@ test("geo check() exits with the configured status and records the reason", func
   check(ngx.exited == nil, "and never exits")
 end)
 
+-- ------------------------------------------------------- log_only log shape --
+--
+-- The log line is the only artefact a log_only rollout produces, so it is an
+-- interface. #12 asks for a false-positive rate PER MODULE from the logs, and
+-- that is one grep only if all four agree on a shape:
+--
+--   <module>: would reject <subject>: <why> (log_only)
+--   <module>: rejected     <subject>: <why>
+
+local function logged(pattern)
+  for _, entry in ipairs(ngx.logs) do
+    if entry.message:find(pattern, 1, true) then return entry.message end
+  end
+  return nil
+end
+
+test("every enforcing module logs the same shape under log_only", function()
+  local cases = {
+    {
+      name = "ratelimit",
+      run = function()
+        local o = { algo = "token-bucket", capacity = 1, rate = 1, window = 1,
+                    key = "shape", log_only = true }
+        ratelimit.limit(o)
+        ratelimit.limit(o)
+      end,
+    },
+    {
+      name = "geo_asn",
+      run = function()
+        geo.check(nil, { deny_countries = { "RU" }, log_only = true })
+      end,
+    },
+    {
+      name = "bot_heuristics",
+      run = function()
+        ngx.req.headers = { ["user-agent"] = "curl/8.4.0", accept = "*/*" }
+        bots.score({ threshold = 0, log_only = true })
+      end,
+    },
+    {
+      name = "jwt",
+      run = function()
+        jwt.require_token({ secret = "s", log_only = true })
+      end,
+    },
+  }
+
+  for _, c in ipairs(cases) do
+    _G.ngx = mock.new()
+    ngx.var.remote_addr = "203.0.113.7"
+    ngx.var.geoip2_country_code = "RU"
+    ngx.var.http_user_agent = "curl/8.0"
+    c.run()
+    check(ngx.exited == nil, c.name .. ": log_only must never exit")
+    check(logged(c.name .. ": would reject "),
+      c.name .. ": no line matching `<module>: would reject ` — a rollout cannot "
+        .. "be counted from these logs")
+    check(logged("(log_only)"),
+      c.name .. ": the line does not say it was log_only, so it reads as a real rejection")
+  end
+end)
+
+test("a real rejection says rejected, and a log_only one never does", function()
+  -- geo_asn used to log "rejected" for a request it let through. Anybody
+  -- counting rejections during a rollout would have read a module that blocked
+  -- nothing as having blocked everything it scored — wrong in the direction
+  -- that gets a rollout cancelled.
+  _G.ngx = mock.new()
+  ngx.var.remote_addr = "203.0.113.7"
+  ngx.var.geoip2_country_code = "RU"
+  geo.check(nil, { deny_countries = { "RU" }, log_only = true })
+  check(logged("would reject") ~= nil, "log_only says would reject")
+  check(logged("geo_asn: rejected") == nil,
+    "log_only must not log the word `rejected` for a request it admitted")
+
+  _G.ngx = mock.new()
+  ngx.var.remote_addr = "203.0.113.7"
+  ngx.var.geoip2_country_code = "RU"
+  geo.check(nil, { deny_countries = { "RU" } })
+  eq(ngx.exited, 403, "enforcing still exits")
+  check(logged("geo_asn: rejected") ~= nil, "and an enforced rejection says rejected")
+  check(logged("would reject") == nil, "and never says `would`")
+end)
+
+test("jwt log_only admits an unverifiable token and says what it would have done", function()
+  _G.ngx = mock.new()
+  ngx.var.remote_addr = "203.0.113.7"
+  local payload, err = jwt.require_token({ secret = "s", log_only = true })
+  check(payload == nil, "the caller still learns the token did not validate")
+  check(err ~= nil, "and why")
+  check(ngx.exited == nil, "but the request is not rejected — the whole point of the flag")
+end)
+
 -- ------------------------------------------------------------------ summary --
 
 io.write(string.format("\n%d passed, %d failed\n", passed, failed))

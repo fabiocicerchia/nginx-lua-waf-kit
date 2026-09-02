@@ -199,7 +199,8 @@ function _M.limit(opts)
   if allowed then return true end
 
   if o.log_only then
-    ngx.log(ngx.WARN, "ratelimit: would reject ", tostring(ngx.var.remote_addr), " (log_only)")
+    ngx.log(ngx.WARN, "ratelimit: would reject ", tostring(ngx.var.remote_addr),
+      ": over limit (log_only)")
     return true
   end
 
