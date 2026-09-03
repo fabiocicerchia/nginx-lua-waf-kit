@@ -1,0 +1,67 @@
+name: bench
+
+# On demand only. This is a load test: it runs seven 30-second wrk scenarios
+# against a container, so it has no business on every push, and its output is
+# an artefact rather than a pass/fail.
+on:
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: "wrk duration per scenario"
+        default: "30s"
+      connections:
+        description: "wrk connections"
+        default: "100"
+      threads:
+        description: "wrk threads"
+        default: "4"
+      image:
+        description: "OpenResty image to benchmark"
+        default: "openresty/openresty:alpine"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: bench-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Run the benchmark
+        env:
+          DURATION: ${{ inputs.duration }}
+          CONNECTIONS: ${{ inputs.connections }}
+          THREADS: ${{ inputs.threads }}
+          IMAGE: ${{ inputs.image }}
+        run: ./bench/run.sh
+
+      # A shared CI runner is not quotable hardware, and bench/README.md
+      # is explicit that a figure from the wrong machine is worse than
+      # none. So the warning is stapled to the top of the artefact rather
+      # than left in a README somebody quoting a number will not open.
+      - name: Mark the numbers as CI numbers
+        run: |
+          {
+            echo "> **NOT QUOTABLE.** Measured on a shared GitHub-hosted"
+            echo "> runner: two cores, a hypervisor, and neighbours. Useful"
+            echo "> for spotting a REGRESSION between two runs on the same"
+            echo "> runner class, and not for the absolute figures a reader"
+            echo "> would put in front of their own capacity planning."
+            echo "> bench/README.md says why."
+            echo
+            cat bench/results.md
+          } > bench/results.ci.md
+          mv bench/results.ci.md bench/results.md
+          cat bench/results.md >> "$GITHUB_STEP_SUMMARY"
+
+      # v4.6.2
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: bench-results
+          path: bench/results.md
+          if-no-files-found: error

@@ -181,8 +181,14 @@ function _M.score(opts)
   ngx.ctx.bot_reasons = reasons
 
   if score >= o.threshold then
-    ngx.log(ngx.WARN, "bot_heuristics: score ", score, " (", table.concat(reasons, "; "), ")")
-    if not o.log_only then return ngx.exit(o.status) end
+    local subject = tostring(ngx.var and ngx.var.remote_addr or "-")
+    local why = "score " .. score .. " (" .. table.concat(reasons, "; ") .. ")"
+    if o.log_only then
+      ngx.log(ngx.WARN, "bot_heuristics: would reject ", subject, ": ", why, " (log_only)")
+      return score, reasons
+    end
+    ngx.log(ngx.WARN, "bot_heuristics: rejected ", subject, ": ", why)
+    return ngx.exit(o.status)
   end
   return score, reasons
 end

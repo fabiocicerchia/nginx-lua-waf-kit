@@ -137,8 +137,15 @@ function _M.check(ip, rules)
   ngx.ctx.geo_reason = reason
   if allowed then return true, reason end
 
-  ngx.log(ngx.WARN, "geo_asn: ", ip, " rejected: ", reason)
-  if o.log_only then return true, reason end
+  -- "rejected" only when it WAS rejected. Saying it for a request the module
+  -- let through is the one wording that makes a log_only rollout unreadable:
+  -- somebody counting rejections would read a module that blocked nothing as
+  -- having blocked everything it scored.
+  if o.log_only then
+    ngx.log(ngx.WARN, "geo_asn: would reject ", ip, ": ", reason, " (log_only)")
+    return true, reason
+  end
+  ngx.log(ngx.WARN, "geo_asn: rejected ", ip, ": ", reason)
   return ngx.exit(o.status)
 end
 

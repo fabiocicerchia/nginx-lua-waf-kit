@@ -45,5 +45,11 @@ make clean        # Remove build artifacts
 - Tests run on any Lua 5.1+ with a mocked `ngx` (`test/mock_ngx.lua`) — keep
   them framework-free and runnable outside nginx.
 - This runs in the request path: no blocking I/O, no unbounded allocation.
+- Every enforcing module needs a `log_only` mode, and its log line is an
+  interface: `<module>: would reject <subject>: <why> (log_only)` when it lets
+  the request through, `<module>: rejected <subject>: <why>` when it does not.
+  `examples/log-only/analyse.sh` counts a rollout from exactly that shape, and
+  saying "rejected" for a request the module admitted is how a rollout that
+  blocked nothing reads as having blocked everything it scored.
 - Don't touch generated files or lockfiles by hand.
 - Ask before large refactors or destructive operations.

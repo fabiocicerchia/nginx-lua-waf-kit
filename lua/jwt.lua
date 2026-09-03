@@ -25,6 +25,11 @@ local DEFAULTS = {
   leeway      = 60,                              -- seconds of clock skew tolerated
   header      = "Authorization",
   status      = 401,
+  -- Validate, log the verdict, and let the request through anyway. The first
+  -- deployment should be non-enforcing everywhere: a JWT module turned on
+  -- enforcing against real traffic rejects every client whose token shape
+  -- nobody checked, and the ones you find that way are your own users.
+  log_only    = false,
   forward_sub = "X-Auth-Sub",                    -- pass the verified subject upstream
 }
 
@@ -265,7 +270,15 @@ function _M.require_token(opts)
   local o = merge(opts)
   local payload, err = _M.validate(ngx.var["http_" .. o.header:lower():gsub("-", "_")], o)
   if not payload then
-    ngx.log(ngx.WARN, "jwt: rejected: ", err)
+    if o.log_only then
+      -- Same line shape as an enforcing rejection, with "would" in it, so one
+      -- grep counts what a rollout is about to break before it breaks it.
+      ngx.log(ngx.WARN, "jwt: would reject ",
+        tostring(ngx.var and ngx.var.remote_addr or "-"), ": ", err, " (log_only)")
+      return nil, err
+    end
+    ngx.log(ngx.WARN, "jwt: rejected ",
+      tostring(ngx.var and ngx.var.remote_addr or "-"), ": ", err)
     ngx.header["WWW-Authenticate"] = 'Bearer error="invalid_token"'
     return ngx.exit(o.status)
   end

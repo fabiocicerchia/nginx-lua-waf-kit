@@ -4,6 +4,12 @@ Runnable, self-contained examples. Each subfolder (or file) should run with a
 single command and show one clear use case.
 
 - `basic/` — minimal end-to-end example.
+- `log-only/` — all five modules loaded and **none of them enforcing**, plus
+  `analyse.sh`, which turns a week of logs into a per-module would-reject rate.
+  This is the first deployment: the thresholds shipped in
+  `waf.conf.example` are a judgement until real traffic has been measured
+  against them, and a bot heuristic tuned on somebody else's traffic will
+  reject your customers.
 
 ## Versioning
 
