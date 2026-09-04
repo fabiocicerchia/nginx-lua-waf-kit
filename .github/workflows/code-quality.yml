@@ -30,6 +30,11 @@ jobs:
           # bump, not something a release should make for us.
           version: v3.11.3
 
+      # The action above only downloads the binary and adds it to PATH;
+      # without this step nothing is ever checked.
+      - name: editorconfig
+        run: editorconfig-checker
+
       # Catch common typos in code and docs.
       - name: typos
         uses: crate-ci/typos@4d9c206a77c041268485162b8e2579ad7a5cb9a3  # branch master
