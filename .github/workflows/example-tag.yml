@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write # creates the tag
+  contents: read
 
 concurrency:
   group: example-tag
@@ -26,6 +26,8 @@ concurrency:
 
 jobs:
   tag:
+    permissions:
+      contents: write # creates the tag
     runs-on: ubuntu-latest
     steps:
       # Shallow: this tags the commit it is running on and pushes the tag.
