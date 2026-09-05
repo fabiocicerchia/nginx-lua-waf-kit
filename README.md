@@ -12,13 +12,13 @@ adopt it incrementally.
 
 ## Modules
 
-| Module | Purpose |
-| --- | --- |
-| `lua/ratelimit.lua` | Shared-dict rate limiting; the five algorithms of the `/ratelimit` visualiser, under the same names. |
-| `lua/bot_heuristics.lua` | Bot *scoring* on headers, header order and TLS fingerprint. |
-| `lua/jwt.lua` | Edge JWT validation: signature, `exp`/`nbf`/`iss`/`aud`, JWKS cache. |
-| `lua/geo_asn.lua` | Geo / ASN allow-deny policy over the geoip2 module's variables. |
-| `lua/mirror.lua` | Request-mirroring hook — **also dark-canary's capture layer**. |
+| Module                   | Purpose                                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------------------------- |
+| `lua/ratelimit.lua`      | Shared-dict rate limiting; the five algorithms of the `/ratelimit` visualiser, under the same names. |
+| `lua/bot_heuristics.lua` | Bot *scoring* on headers, header order and TLS fingerprint.                                          |
+| `lua/jwt.lua`            | Edge JWT validation: signature, `exp`/`nbf`/`iss`/`aud`, JWKS cache.                                 |
+| `lua/geo_asn.lua`        | Geo / ASN allow-deny policy over the geoip2 module's variables.                                      |
+| `lua/mirror.lua`         | Request-mirroring hook — **also dark-canary's capture layer**.                                       |
 
 `examples/waf.conf.example` shows the whole wiring.
 
