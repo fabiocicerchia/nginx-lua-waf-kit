@@ -22,7 +22,7 @@ docker compose up -d
 
 ## What comes out
 
-```
+```text
 log_only rollout — 184203 request(s) in the window
 
 module           would-reject      rate  verdict
@@ -51,7 +51,7 @@ to remove one customer in fifty.
 Every enforcing module writes the same shape, which is what makes the analyser
 one loop instead of four parsers:
 
-```
+```text
 <module>: would reject <subject>: <why> (log_only)
 <module>: rejected     <subject>: <why>
 ```
@@ -74,9 +74,9 @@ log_only rollout that turns traffic away is not measuring what it thinks it is.
    only if none of that traffic was hostile. On an internet-facing host some of
    it was; on an internal one, almost none. The reason field is what tells the
    two apart.
-2. **Enforce one module at a time**, starting with the lowest rate, and leave a
+1. **Enforce one module at a time**, starting with the lowest rate, and leave a
    week between each. `log_only = false` on that module only.
-3. **Feed the thresholds back.** The defaults in `examples/waf.conf.example` are
+1. **Feed the thresholds back.** The defaults in `examples/waf.conf.example` are
    what this exercise exists to correct — a rate measured on real traffic beats
    a number chosen in advance, every time.
 

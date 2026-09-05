@@ -11,7 +11,7 @@ release blocker** — it is now one command away from being answered.
 
 ## Running it
 
-```
+```text
 ./run.sh                                   # openresty/openresty:alpine, 30s each
 IMAGE=your/nginx-lua:tag DURATION=60s ./run.sh
 ```
@@ -19,14 +19,14 @@ IMAGE=your/nginx-lua:tag DURATION=60s ./run.sh
 Needs docker. Writes `results.md` with everything needed to reproduce it or to
 distrust it:
 
-| recorded | why |
-| --- | --- |
-| image tag **and digest** | `openresty:alpine` is a moving tag; a latency figure attributed to the wrong build is worse than no figure |
-| `openresty -v` from the container that ran it | the build, not the tag |
-| kit revision | the module settings are in `bench/nginx.conf` at that commit, and they are part of the measurement |
-| CPU model, cores, kernel | "4 cores" on a shared runner and on bare metal are not the same measurement |
-| wrk threads, connections, duration | |
-| the exact command to re-run | so reproducing it is a copy-paste, not a reconstruction |
+| recorded                                      | why                                                                                                        |
+| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| image tag **and digest**                      | `openresty:alpine` is a moving tag; a latency figure attributed to the wrong build is worse than no figure |
+| `openresty -v` from the container that ran it | the build, not the tag                                                                                     |
+| kit revision                                  | the module settings are in `bench/nginx.conf` at that commit, and they are part of the measurement         |
+| CPU model, cores, kernel                      | "4 cores" on a shared runner and on bare metal are not the same measurement                                |
+| wrk threads, connections, duration            |                                                                                                            |
+| the exact command to re-run                   | so reproducing it is a copy-paste, not a reconstruction                                                    |
 
 ### From CI, on demand
 
@@ -49,15 +49,15 @@ hardware, same upstream (a static 200), with the Lua in the request path as the
 only variable. `run.sh` drives each location with `wrk` and records req/s and
 p50/p90/p99 latency.
 
-| Scenario | What it isolates |
-| --- | --- |
-| `baseline` | no Lua at all — every other row is read as a delta from this |
-| `ratelimit` | token bucket, limit set high enough that nothing is rejected |
-| `ratelimit-log` | sliding log, the expensive algorithm, for the worst case |
-| `bots` | header scoring, including the raw-header order parse |
-| `geo` | country/ASN policy over the geoip2 variables |
-| `mirror` | the decision, sampling and correlation id — not the mirrored request |
-| `all` | everything on, which is what an adopter actually runs |
+| Scenario        | What it isolates                                                     |
+| --------------- | -------------------------------------------------------------------- |
+| `baseline`      | no Lua at all — every other row is read as a delta from this         |
+| `ratelimit`     | token bucket, limit set high enough that nothing is rejected         |
+| `ratelimit-log` | sliding log, the expensive algorithm, for the worst case             |
+| `bots`          | header scoring, including the raw-header order parse                 |
+| `geo`           | country/ASN policy over the geoip2 variables                         |
+| `mirror`        | the decision, sampling and correlation id — not the mirrored request |
+| `all`           | everything on, which is what an adopter actually runs                |
 
 The rate limiter is deliberately configured **not to reject** during the
 benchmark: the cost being measured is the cost of deciding, not the cost of

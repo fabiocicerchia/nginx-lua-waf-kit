@@ -1,6 +1,6 @@
 # Basic Example
 
-What it shows: <one line>.
+What it shows: `<one line>`.
 
 ## Run
 
