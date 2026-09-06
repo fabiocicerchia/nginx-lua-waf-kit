@@ -47,6 +47,32 @@ init_by_lua_block {
 
 `examples/waf.conf.example` shows the whole wiring; every module is opt-in.
 
+## Development
+
+### Make targets
+
+`make help` lists them. Every repository in this estate exposes the same eight
+verbs, so you do not have to read a Makefile to find out how to build or test it
+(FC-GEN-057).
+
+| Verb      | What it does here                                       |
+| --------- | ------------------------------------------------------- |
+| `setup`   | Install the pre-commit hook                             |
+| `test`    | `lua test/run.lua`                                      |
+| `lint`    | `pre-commit run --all-files` — the whole gate           |
+| `format`  | Rewrite what the gate can fix: whitespace, endings, EOF |
+| `analyze` | `luacheck .`, with the rules in `.luacheckrc`           |
+
+#### Not applicable
+
+Three verbs have no meaning for a set of Lua modules loaded by nginx. They exit
+0 and say so rather than pretending to work (FC-GEN-058):
+
+- `build` — nothing is compiled; nginx loads the sources at request time.
+- `install` — point `lua_package_path` at this checkout, or copy the modules
+  next to your nginx config.
+- `run` — a WAF module is called by nginx per request, never run on its own.
+
 ## Documentation
 
 Full docs live in [`docs/`](docs/). Runnable examples live in [`examples/`](examples/).
