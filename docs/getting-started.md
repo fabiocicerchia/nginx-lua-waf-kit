@@ -18,7 +18,7 @@
 
 ## Tests
 
-```
+```text
 lua test/run.lua        # any Lua 5.1+, no framework, no dependencies
 resty test/run.lua      # inside the nginx-lua image itself
 ```
