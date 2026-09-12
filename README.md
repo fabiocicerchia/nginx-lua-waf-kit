@@ -10,6 +10,23 @@ An opt-in Lua module set for the existing nginx-lua image — **a kit, not a WAF
 product**. Versioned tag-for-tag against nginx-lua releases so existing users
 adopt it incrementally.
 
+## Features
+
+- **A kit, not a WAF product** — five independent Lua modules you enable one
+  at a time, rather than a policy engine you adopt wholesale.
+- Shared-dict **rate limiting** with the same five algorithms, under the same
+  names, as the `/ratelimit` visualiser.
+- **Bot scoring** on headers, header order and TLS fingerprint — a score you
+  act on, not a verdict imposed on you.
+- **Edge JWT validation**: signature, `exp` / `nbf` / `iss` / `aud`, with a
+  JWKS cache.
+- **Geo / ASN allow-deny** policy layered over the geoip2 module's variables.
+- **Request mirroring**, which doubles as dark-canary's capture layer.
+- Versioned tag-for-tag against nginx-lua releases, so existing users adopt it
+  incrementally instead of migrating.
+- Nothing is compiled and nothing runs on its own: point `lua_package_path` at
+  the checkout and nginx loads the sources per request.
+
 ## Modules
 
 | Module                   | Purpose                                                                                              |
