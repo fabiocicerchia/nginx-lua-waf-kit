@@ -5,6 +5,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      # Everything else rides in one pull request rather than one each.
+      actions:
+        patterns: ["*"]
 
   # Uncomment and set the ecosystem for your project's dependencies.
   # ecosystems: npm, pip, gomod, cargo, bundler, maven, composer, nuget, ...

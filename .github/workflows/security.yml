@@ -1,8 +1,8 @@
 name: security
 
 on:
-  push:
-    branches: [main]
+  # No push trigger: the pull request already ran this on the identical
+  # tree. What a merge cannot tell you, the schedule below can.
   pull_request:
   schedule:
     - cron: "0 6 * * 1" # weekly, catches newly disclosed CVEs
@@ -10,6 +10,10 @@ on:
 permissions:
   pull-requests: read # gitleaks reads PR commits
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   secrets:
@@ -24,6 +28,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   vulns:
+    # A github-actions bump cannot introduce a CVE here; dependency-review still runs.
+    if: ${{ !startsWith(github.head_ref, 'dependabot/github_actions/') }}
     name: filesystem & dependency scan (trivy)
     runs-on: ubuntu-latest
     permissions:
