@@ -5,6 +5,13 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.3](https://github.com/fabiocicerchia/nginx-lua-waf-kit/compare/v1.3.2...v1.3.3) (2026-09-28)
+
+
+### Bug Fixes
+
+* **bot_heuristics:** score HTTP/2 requests instead of aborting them ([#64](https://github.com/fabiocicerchia/nginx-lua-waf-kit/issues/64)) ([8d36a1a](https://github.com/fabiocicerchia/nginx-lua-waf-kit/commit/8d36a1af184aa8d07d9d89a950328dec8074d436))
+
 ## [1.3.2](https://github.com/fabiocicerchia/nginx-lua-waf-kit/compare/v1.3.1...v1.3.2) (2026-09-20)
 
 
