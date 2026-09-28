@@ -312,6 +312,16 @@ test("header order is read from the raw request, not the header hash", function(
   eq(order[3], "accept")
 end)
 
+test("an HTTP/2 request is scored without its header order, not aborted", function()
+  -- raw_header() exists on HTTP/2 and raises when called: there is no raw
+  -- header block, only HPACK frames. Uncaught, that is a 500 for every browser.
+  _G.ngx = mock.new({ headers = { ["user-agent"] = "curl/8.4.0", accept = "*/*" } })
+  function ngx.req.raw_header() error("http2 requests not supported yet") end
+  local ok, score = pcall(bots.score, { log_only = true })
+  check(ok, "score() raised: " .. tostring(score))
+  check(score > 0, "the other signals still score it")
+end)
+
 -- ------------------------------------------------------------------ geo_asn --
 
 local geo = require("geo_asn")
