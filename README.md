@@ -17,7 +17,8 @@ adopt it incrementally.
 - Shared-dict **rate limiting** with the same five algorithms, under the same
   names, as the `/ratelimit` visualiser.
 - **Bot scoring** on headers, header order and TLS fingerprint — a score you
-  act on, not a verdict imposed on you.
+  act on, not a verdict imposed on you. Header order is read from the raw
+  request, so it scores HTTP/1.x only; HTTP/2 and HTTP/3 are scored on the rest.
 - **Edge JWT validation**: signature, `exp` / `nbf` / `iss` / `aud`, with a
   JWKS cache.
 - **Geo / ASN allow-deny** policy layered over the geoip2 module's variables.

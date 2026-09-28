@@ -166,10 +166,13 @@ function _M.score(opts)
   local o = merge(opts)
 
   local headers = ngx.req.get_headers()
+  -- raw_header() exists on HTTP/2 and HTTP/3 and raises when called ("http2
+  -- requests not supported yet"): there is no raw header block, only HPACK or
+  -- QPACK frames. Order is unknown there, and header_order_signal skips a nil
+  -- order, so the request is scored on everything else rather than aborted.
   local order = nil
-  if ngx.req.raw_header then
-    order = _M.header_order(ngx.req.raw_header(true))
-  end
+  local ok, raw = pcall(ngx.req.raw_header, true)
+  if ok then order = _M.header_order(raw) end
 
   local score, reasons = _M.score_request({
     headers = headers,
