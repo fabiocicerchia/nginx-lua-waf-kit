@@ -275,10 +275,13 @@ function _M.require_token(opts)
       -- grep counts what a rollout is about to break before it breaks it.
       ngx.log(ngx.WARN, "jwt: would reject ",
         tostring(ngx.var and ngx.var.remote_addr or "-"), ": ", err, " (log_only)")
+      ngx.ctx.waf_would_reject = ngx.ctx.waf_would_reject or {}
+      ngx.ctx.waf_would_reject.jwt = true
       return nil, err
     end
     ngx.log(ngx.WARN, "jwt: rejected ",
       tostring(ngx.var and ngx.var.remote_addr or "-"), ": ", err)
+    ngx.ctx.waf_rejected = "jwt"
     ngx.header["WWW-Authenticate"] = 'Bearer error="invalid_token"'
     return ngx.exit(o.status)
   end
