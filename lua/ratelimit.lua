@@ -201,6 +201,7 @@ function _M.limit(opts)
   if o.log_only then
     ngx.log(ngx.WARN, "ratelimit: would reject ", tostring(ngx.var.remote_addr),
       ": over limit (log_only)")
+    ngx.ctx.waf_would_reject = "ratelimit"
     return true
   end
 
@@ -210,6 +211,7 @@ function _M.limit(opts)
   -- and a limiter that rejects silently is the one case that check missed.
   ngx.log(ngx.WARN, "ratelimit: rejected ", tostring(ngx.var.remote_addr),
     ": over limit")
+  ngx.ctx.waf_rejected = "ratelimit"
   ngx.header["Retry-After"] = ceil(retry_after)
   return ngx.exit(o.status)
 end

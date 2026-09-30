@@ -817,6 +817,8 @@ test("every enforcing module logs the same shape under log_only", function()
         .. "be counted from these logs")
     check(logged("(log_only)"),
       c.name .. ": the line does not say it was log_only, so it reads as a real rejection")
+    eq(ngx.ctx.waf_would_reject, c.name, c.name .. ": ngx.ctx.waf_would_reject")
+    eq(ngx.ctx.waf_rejected, nil, c.name .. ": a log_only request was not rejected")
   end
 
   -- The other half, which nothing checked for anything but geo_asn — and
@@ -835,6 +837,7 @@ test("every enforcing module logs the same shape under log_only", function()
         .. "analyse.sh cannot tell this rollout is no longer log_only")
     check(logged("(log_only)") == nil,
       c.name .. ": a real rejection must not be tagged (log_only)")
+    eq(ngx.ctx.waf_rejected, c.name, c.name .. ": ngx.ctx.waf_rejected")
   end
 end)
 
