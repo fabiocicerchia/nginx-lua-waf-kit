@@ -201,7 +201,8 @@ function _M.limit(opts)
   if o.log_only then
     ngx.log(ngx.WARN, "ratelimit: would reject ", tostring(ngx.var.remote_addr),
       ": over limit (log_only)")
-    ngx.ctx.waf_would_reject = "ratelimit"
+    ngx.ctx.waf_would_reject = ngx.ctx.waf_would_reject or {}
+    ngx.ctx.waf_would_reject.ratelimit = true
     return true
   end
 

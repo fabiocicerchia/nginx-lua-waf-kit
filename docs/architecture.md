@@ -25,11 +25,14 @@ rejection carries the reasons that produced it. A heuristic that blocks silently
 eventually blocks a customer.
 
 **The verdict is readable after the fact.** Next to its log line, an enforcing
-module records the verdict in `ngx.ctx`: `ngx.ctx.waf_rejected` holds the name
-of the module that rejected the request, and `ngx.ctx.waf_would_reject` holds the
-name of one that would have rejected it under `log_only`. A `log_by_lua` block
-can count blocks and would-be blocks per module from these fields, without
-wrapping the entry points or parsing the error log.
+module records the verdict in `ngx.ctx`. `ngx.ctx.waf_rejected` holds the name
+of the module that rejected the request. `ngx.ctx.waf_would_reject` is a set,
+keyed by module name, of every module that would have rejected it under
+`log_only`. A `log_by_lua` block can count blocks and would-be blocks per module
+from these fields, without wrapping the entry points or parsing the error log.
+`ngx.ctx` does not survive an internal redirect, so a rejection answered through
+`error_page` reaches the log phase without its verdict: count it by status
+there, or serve the error body without redirecting.
 
 **Fail in the safe direction, per module.** A missing `lua_shared_dict` fails the
 rate limiter *open* and logs loudly — 503-ing every request over a config typo is

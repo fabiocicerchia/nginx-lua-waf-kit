@@ -188,7 +188,8 @@ function _M.score(opts)
     local why = "score " .. score .. " (" .. table.concat(reasons, "; ") .. ")"
     if o.log_only then
       ngx.log(ngx.WARN, "bot_heuristics: would reject ", subject, ": ", why, " (log_only)")
-      ngx.ctx.waf_would_reject = "bot_heuristics"
+      ngx.ctx.waf_would_reject = ngx.ctx.waf_would_reject or {}
+      ngx.ctx.waf_would_reject.bot_heuristics = true
       return score, reasons
     end
     ngx.log(ngx.WARN, "bot_heuristics: rejected ", subject, ": ", why)

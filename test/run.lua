@@ -817,7 +817,8 @@ test("every enforcing module logs the same shape under log_only", function()
         .. "be counted from these logs")
     check(logged("(log_only)"),
       c.name .. ": the line does not say it was log_only, so it reads as a real rejection")
-    eq(ngx.ctx.waf_would_reject, c.name, c.name .. ": ngx.ctx.waf_would_reject")
+    check(ngx.ctx.waf_would_reject and ngx.ctx.waf_would_reject[c.name],
+      c.name .. ": not in ngx.ctx.waf_would_reject")
     eq(ngx.ctx.waf_rejected, nil, c.name .. ": a log_only request was not rejected")
   end
 
@@ -839,6 +840,16 @@ test("every enforcing module logs the same shape under log_only", function()
       c.name .. ": a real rejection must not be tagged (log_only)")
     eq(ngx.ctx.waf_rejected, c.name, c.name .. ": ngx.ctx.waf_rejected")
   end
+end)
+
+test("every log_only module that would reject is recorded, not just the last", function()
+  _G.ngx = mock.new()
+  ngx.var.remote_addr = "203.0.113.7"
+  ngx.var.geoip2_country_code = "RU"
+  geo.check(nil, { deny_countries = { "RU" }, log_only = true })
+  jwt.require_token({ secret = "s", log_only = true })
+  check(ngx.ctx.waf_would_reject.geo_asn, "geo_asn was overwritten by jwt")
+  check(ngx.ctx.waf_would_reject.jwt, "jwt was not recorded")
 end)
 
 test("a real rejection says rejected, and a log_only one never does", function()
