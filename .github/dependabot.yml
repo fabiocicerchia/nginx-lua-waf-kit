@@ -5,6 +5,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     groups:
       # Everything else rides in one pull request rather than one each.
       actions:
