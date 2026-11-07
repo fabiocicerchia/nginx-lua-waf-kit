@@ -11,7 +11,7 @@ Feature: Branding the documentation site
     When a reader opens the splash page and then the docs
     Then the splash page title and its GitHub button are drawn in an orange-to-red gradient
     And the docs home title and primary buttons are drawn in the same orange-to-red gradient
-    And the docs header and the splash install label use the red #ef4444
+    And the docs links in the light scheme, the splash install label and its "Full docs" link use the red #ef4444
 
   @id:documentation.site-theme.002 @rule:docs.theme.no-external-font-requests @inferred @source:docs/stylesheets/extra.css#:root
   Scenario: Reading the docs fetches no web fonts

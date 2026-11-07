@@ -28,6 +28,6 @@ Feature: Counting a rate limit per client
   Scenario: Two limits using the same algorithm and key draw on one shared quota
     Given the operator limits /api with capacity 2 and /login with capacity 20, both token-bucket on the client address
     And the client at 203.0.113.7 has used 2 requests on /api
-    When the client sends a request to /login
-    Then the request is counted against the quota already used on /api
-    And the response carries X-RateLimit-Remaining: 17 rather than 19
+    When the client sends a request to /login at the same instant
+    Then the request is refused, because /login starts from the tokens /api left rather than its own 20
+    And the response carries X-RateLimit-Remaining: 0

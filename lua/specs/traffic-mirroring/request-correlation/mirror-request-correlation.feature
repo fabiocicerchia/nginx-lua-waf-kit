@@ -18,5 +18,5 @@ Feature: Pairing live and shadow requests for comparison
     Given the collector at 127.0.0.1:8099 is unreachable
     When a mirrored request completes at the edge node
     Then the client receives its response unaffected
-    And the capture is posted after the response, as JSON to /captures
-    And the edge node logs "dark-canary: collector unreachable" as a warning
+    And the attempt to post the capture to the collector happens after the response is on its way
+    And the edge node logs "dark-canary: collector unreachable" as a warning and drops the capture
