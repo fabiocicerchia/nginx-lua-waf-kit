@@ -1,0 +1,355 @@
+{
+ "excluded": {
+  "docs/stylesheets": [
+   {
+    "candidate": "Header is translucent and blurred with a hairline divider and a soft shadow when scrolled",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#.md-header"
+   },
+   {
+    "candidate": "Heading weights, letter-spacing and ligatures",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#.md-typeset h1"
+   },
+   {
+    "candidate": "Code blocks have rounded, bordered edges",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#.md-typeset .highlight"
+   },
+   {
+    "candidate": "Table headers uppercase with smaller font",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#.md-typeset table:not([class]) th"
+   },
+   {
+    "candidate": "Buttons are pill-shaped and lift on hover",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#.md-typeset .md-button"
+   },
+   {
+    "candidate": "Hero block centred layout and tagline sizing",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#.md-typeset .hero"
+   },
+   {
+    "candidate": "Feature cards gain depth, accent border and lift on hover; card icons take the accent colour",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#.md-typeset .grid.cards > ul > li"
+   },
+   {
+    "candidate": "Nav tab opacity and active link weight",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#.md-tabs__link"
+   },
+   {
+    "candidate": "Footer background and divider",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#.md-footer-meta"
+   },
+   {
+    "candidate": "Smooth scrolling to anchors",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "docs/stylesheets/extra.css#html"
+   },
+   {
+    "candidate": "Dark scheme header and tabs share the #0b0f1a background",
+    "covered_by": "docs.theme.legible-links-per-scheme",
+    "reason": "DUPLICATE_OF",
+    "source": "docs/stylesheets/extra.css#[data-md-color-scheme=\"slate\"] .md-header"
+   },
+   {
+    "candidate": "Palette mapped onto Material CSS custom properties (--md-primary-fg-color etc.)",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "docs/stylesheets/extra.css#:root"
+   }
+  ],
+  "nginx-lua-waf-kit/makefile": [
+   {
+    "candidate": "make setup installs the pre-commit hook",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#setup"
+   },
+   {
+    "candidate": "make lint runs every pre-commit hook on every file",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#lint"
+   },
+   {
+    "candidate": "make test runs lua test/run.lua",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "Makefile#test"
+   },
+   {
+    "candidate": "make analyze runs luacheck with .luacheckrc rules when installed",
+    "covered_by": "",
+    "reason": "TECH_BUILD",
+    "source": "Makefile#analyze"
+   },
+   {
+    "candidate": "All verbs declared .PHONY",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "Makefile"
+   }
+  ]
+ },
+ "lifted": {
+  "docs/stylesheets": [],
+  "nginx-lua-waf-kit/makefile": []
+ },
+ "retired": [],
+ "scenarios": {
+  "developer-tooling.make-commands.001": {
+   "file": "specs/developer-tooling/make-commands/make-verbs.feature",
+   "fingerprint": "517de792f113",
+   "human": false,
+   "rule": "tooling.make.bare-make-lists-verbs",
+   "source": "Makefile#help",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "developer-tooling.make-commands.002": {
+   "file": "specs/developer-tooling/make-commands/make-verbs.feature",
+   "fingerprint": "e64988e8cab6",
+   "human": false,
+   "rule": "tooling.make.not-applicable-verbs-explain-themselves",
+   "source": "Makefile#build",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "developer-tooling.make-commands.003": {
+   "file": "specs/developer-tooling/make-commands/make-verbs.feature",
+   "fingerprint": "dce855bf0320",
+   "human": false,
+   "rule": "tooling.make.analyze-refuses-without-luacheck",
+   "source": "Makefile#analyze",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "developer-tooling.make-commands.004": {
+   "file": "specs/developer-tooling/make-commands/make-verbs.feature",
+   "fingerprint": "a675569d9b1e",
+   "human": false,
+   "rule": "tooling.make.format-succeeds-after-rewriting",
+   "source": "Makefile#format",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "documentation.site-theme.001": {
+   "file": "specs/documentation/site-theme/docs-site-theme.feature",
+   "fingerprint": "ac660254fd34",
+   "human": false,
+   "rule": "docs.theme.shared-accent-palette",
+   "source": "docs/stylesheets/extra.css#:root",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "documentation.site-theme.002": {
+   "file": "specs/documentation/site-theme/docs-site-theme.feature",
+   "fingerprint": "ac660254fd34",
+   "human": false,
+   "rule": "docs.theme.no-external-font-requests",
+   "source": "docs/stylesheets/extra.css#:root",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "documentation.site-theme.003": {
+   "file": "specs/documentation/site-theme/docs-site-theme.feature",
+   "fingerprint": "433084a194b6",
+   "human": false,
+   "rule": "docs.theme.legible-links-per-scheme",
+   "source": "docs/stylesheets/extra.css#[data-md-color-scheme=\"slate\"]",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "documentation.site-theme.004": {
+   "file": "specs/documentation/site-theme/docs-site-theme.feature",
+   "fingerprint": "c702704e5aae",
+   "human": false,
+   "rule": "docs.theme.no-stand-in-logo",
+   "source": "docs/stylesheets/extra.css#.md-header__button.md-logo",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "documentation.site-theme.005": {
+   "file": "specs/documentation/site-theme/docs-site-theme.feature",
+   "fingerprint": "721086d36c47",
+   "human": false,
+   "rule": "docs.theme.wide-tables-scroll",
+   "source": "docs/stylesheets/extra.css#.md-typeset table:not([class])",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  }
+ },
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "Verifying JWT bearer tokens and rejecting requests with missing, expired or invalid tokens.",
+      "slug": "token-auth",
+      "title": "Token authentication"
+     },
+     {
+      "description": "Allowing or denying requests by country or autonomous system of the client address.",
+      "slug": "geo-asn-filtering",
+      "title": "Geo and network filtering"
+     },
+     {
+      "description": "Scoring requests with heuristics to spot automated clients and reject likely bots.",
+      "slug": "bot-detection",
+      "title": "Bot detection"
+     }
+    ],
+    "description": "Deciding which callers may reach the upstream based on who or where they are.",
+    "slug": "access-control",
+    "title": "Access control"
+   },
+   {
+    "areas": [
+     {
+      "description": "Capping request rates per client or key and rejecting traffic over the limit.",
+      "slug": "rate-limiting",
+      "title": "Rate limiting"
+     },
+     {
+      "description": "Copying live requests to a secondary destination without affecting the client response.",
+      "slug": "traffic-mirroring",
+      "title": "Traffic mirroring"
+     }
+    ],
+    "description": "Shaping and copying request flow so the upstream stays healthy and observable.",
+    "slug": "traffic-control",
+    "title": "Traffic control"
+   },
+   {
+    "areas": [
+     {
+      "description": "Running any enforcing module so it records would-reject decisions while letting requests through.",
+      "slug": "log-only-mode",
+      "title": "Log-only mode"
+     },
+     {
+      "description": "Emitting a stable rejected / would-reject log line per decision as a public interface.",
+      "slug": "decision-logging",
+      "title": "Decision logging"
+     },
+     {
+      "description": "Counting logged decisions from a rollout to judge impact before switching to enforce.",
+      "slug": "rollout-analysis",
+      "title": "Rollout analysis"
+     }
+    ],
+    "description": "Introducing enforcement gradually and measuring what it would have done before it blocks anything.",
+    "slug": "safe-rollout",
+    "title": "Safe rollout"
+   },
+   {
+    "areas": [
+     {
+      "description": "Loading modules via lua_package_path and calling them from nginx configuration.",
+      "slug": "nginx-wiring",
+      "title": "nginx wiring"
+     },
+     {
+      "description": "Ready-to-run example configurations, including a basic and a log-only compose stack.",
+      "slug": "example-setups",
+      "title": "Example setups"
+     },
+     {
+      "description": "Matching kit releases tag-for-tag to nginx-lua image versions and documenting which examples fit which runtime.",
+      "slug": "runtime-compatibility",
+      "title": "Runtime compatibility"
+     }
+    ],
+    "description": "Getting the modules into an existing nginx-lua deployment one piece at a time.",
+    "slug": "adoption",
+    "title": "Adoption and integration"
+   },
+   {
+    "areas": [
+     {
+      "description": "Getting-started, architecture and module reference pages built with MkDocs.",
+      "slug": "guides",
+      "title": "Guides"
+     },
+     {
+      "description": "The offline, self-contained visual theme and accent palette shared by the docs and the splash page.",
+      "slug": "site-theme",
+      "title": "Site theme and branding"
+     }
+    ],
+    "description": "The published guides and landing page that explain the kit to users.",
+    "slug": "documentation",
+    "title": "Documentation site"
+   },
+   {
+    "areas": [
+     {
+      "description": "The standard set of make verbs, including help output and declared no-ops that explain why they do nothing.",
+      "slug": "make-commands",
+      "title": "Make commands"
+     },
+     {
+      "description": "Pre-commit hooks, Lua static analysis and auto-formatting that gate every change locally and in CI.",
+      "slug": "quality-gate",
+      "title": "Quality gate"
+     },
+     {
+      "description": "Framework-free assert tests that run on plain Lua against a mocked nginx API.",
+      "slug": "testing",
+      "title": "Testing"
+     },
+     {
+      "description": "Measuring the request-path overhead of the modules under load.",
+      "slug": "benchmarking",
+      "title": "Benchmarking"
+     }
+    ],
+    "description": "The commands and checks contributors use to work on, verify and measure the kit.",
+    "slug": "developer-tooling",
+    "title": "Developer tooling"
+   },
+   {
+    "areas": [
+     {
+      "description": "Conventional-commit driven version bumps and generated changelogs.",
+      "slug": "versioning-changelog",
+      "title": "Versioning and changelog"
+     },
+     {
+      "description": "Pinned hooks and actions, dependency updates and secret scanning that guard the release path.",
+      "slug": "dependency-security",
+      "title": "Dependency and secret hygiene"
+     }
+    ],
+    "description": "Versioning, publishing and protecting the project and its dependencies.",
+    "slug": "release-supply-chain",
+    "title": "Release and supply chain"
+   }
+  ]
+ }
+}

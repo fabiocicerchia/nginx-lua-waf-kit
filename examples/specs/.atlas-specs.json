@@ -1,0 +1,186 @@
+{
+ "excluded": {
+  "log-only/analyse": [
+   {
+    "candidate": "Default log paths ./logs/waf.log and ./logs/access.log, overridable by arguments",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "examples/log-only/analyse.sh#main"
+   },
+   {
+    "candidate": "Report column layout and printf widths",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "examples/log-only/analyse.sh#main"
+   },
+   {
+    "candidate": "Closing 'Reading this' guidance note",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "examples/log-only/analyse.sh#main"
+   },
+   {
+    "candidate": "Modules log '<module>: would reject ... (log_only)' / '<module>: rejected ...' (the interface itself)",
+    "covered_by": "belongs to the emitting modules (operations/logging-interface), not to the analyser",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/geo_asn.lua"
+   },
+   {
+    "candidate": "Each module's would-reject rate is measured against every request in the window",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "examples/log-only/analyse.sh#main"
+   },
+   {
+    "candidate": "A module's verdict depends on how much of the traffic it would reject, with a looser band for the rate limiter",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "examples/log-only/analyse.sh#main"
+   },
+   {
+    "candidate": "The analysis refuses to report when there is no log to read or no traffic to compute a rate against",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "examples/log-only/analyse.sh#main"
+   },
+   {
+    "candidate": "A module that actually rejected traffic during a log-only run is called out, with a warning for the whole run",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "examples/log-only/analyse.sh#main"
+   },
+   {
+    "candidate": "A module that would have rejected nothing is flagged as either clean traffic or not wired in",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "examples/log-only/analyse.sh#main"
+   },
+   {
+    "candidate": "Mirrored requests are reported as load, not as false positives",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "examples/log-only/analyse.sh#main"
+   },
+   {
+    "candidate": "The rollout report carries no client identifiers",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "examples/log-only/analyse.sh#main"
+   }
+  ]
+ },
+ "lifted": {
+  "log-only/analyse": []
+ },
+ "retired": [],
+ "scenarios": {},
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "Capping how many requests a client may send, with capacity tuning guided by would-reject rates.",
+      "slug": "rate-limiting",
+      "title": "Rate limiting"
+     },
+     {
+      "description": "Scoring requests with heuristics to spot automated clients without turning away real users.",
+      "slug": "bot-detection",
+      "title": "Bot detection"
+     },
+     {
+      "description": "Admitting or rejecting requests based on the caller's country or autonomous system.",
+      "slug": "geo-network-filtering",
+      "title": "Geo and network filtering"
+     }
+    ],
+    "description": "Shielding upstream services from abusive or unwanted request traffic at the nginx edge.",
+    "slug": "traffic-protection",
+    "title": "Traffic Protection"
+   },
+   {
+    "areas": [
+     {
+      "description": "Validating JWT bearer tokens and rejecting requests whose tokens fail the check.",
+      "slug": "token-verification",
+      "title": "Token verification"
+     },
+     {
+      "description": "How a request refused by an enforcing module is turned away and logged as rejected.",
+      "slug": "rejection-responses",
+      "title": "Rejection responses"
+     }
+    ],
+    "description": "Deciding whether a request carries valid credentials before it reaches the application.",
+    "slug": "access-control",
+    "title": "Access Control"
+   },
+   {
+    "areas": [
+     {
+      "description": "Copying incoming requests to a mirror target and logging each duplication.",
+      "slug": "request-duplication",
+      "title": "Request duplication"
+     },
+     {
+      "description": "Reporting how much traffic was duplicated as a load question rather than a false-positive one.",
+      "slug": "mirror-load-accounting",
+      "title": "Mirror load accounting"
+     }
+    ],
+    "description": "Duplicating live requests to a secondary destination without affecting the original response.",
+    "slug": "traffic-mirroring",
+    "title": "Traffic Mirroring"
+   },
+   {
+    "areas": [
+     {
+      "description": "Running any enforcing module so it logs a standard would-reject line but lets the request through.",
+      "slug": "log-only-mode",
+      "title": "Log-only mode"
+     },
+     {
+      "description": "Computing per-module would-reject counts and rates against total traffic from the WAF and access logs, with per-module verdict bands.",
+      "slug": "rollout-analysis",
+      "title": "Rollout analysis"
+     },
+     {
+      "description": "Flagging modules that actually rejected traffic during a run meant to be log-only, and modules that scored nothing.",
+      "slug": "enforcement-drift-warnings",
+      "title": "Enforcement drift warnings"
+     },
+     {
+      "description": "Producing aggregate-only reports with no IPs, tokens, user-agents or paths, so results can be shared as-is.",
+      "slug": "privacy-safe-reporting",
+      "title": "Privacy-safe reporting"
+     }
+    ],
+    "description": "Adopting enforcing modules incrementally by observing what they would block before they block it.",
+    "slug": "safe-rollout",
+    "title": "Safe Rollout"
+   },
+   {
+    "areas": [
+     {
+      "description": "The fixed log line shapes and the paired WAF and access logs that downstream tooling depends on.",
+      "slug": "logging-interface",
+      "title": "Logging interface"
+     },
+     {
+      "description": "Example compose setups and scripts for bringing the kit up, sending traffic and inspecting the results.",
+      "slug": "local-environment",
+      "title": "Local environment"
+     },
+     {
+      "description": "Build, lint, mocked-ngx tests, benchmarks, git hooks and versioned releases that track nginx-lua tags.",
+      "slug": "build-test-release",
+      "title": "Build, test and release"
+     }
+    ],
+    "description": "Running, configuring, testing and releasing the kit alongside the nginx-lua image.",
+    "slug": "operations",
+    "title": "Operations and Developer Tooling"
+   }
+  ]
+ }
+}
