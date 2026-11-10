@@ -1,0 +1,249 @@
+{
+ "excluded": {
+  "bench/run": [
+   {
+    "candidate": "Progress messages 'starting <image>' and 'benchmarking /<scenario>' on stdout",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bench/run.sh#SCENARIOS"
+   },
+   {
+    "candidate": "Closing note in results.md explaining rows are deltas from baseline",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "bench/run.sh#SCENARIOS"
+   },
+   {
+    "candidate": "Load generator runs in a container on the host network; kit mounted read-only into the server",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bench/run.sh#cleanup"
+   },
+   {
+    "candidate": "Parsing of wrk output with awk patterns",
+    "covered_by": "performance.benchmark.unparsed-figure-shown-as-question-mark",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "bench/run.sh#SCENARIOS"
+   },
+   {
+    "candidate": "PORT and WRK_IMAGE overrides",
+    "covered_by": "performance.benchmark.load-settings-overridable",
+    "reason": "TRIVIAL",
+    "source": "bench/run.sh#IMAGE"
+   },
+   {
+    "candidate": "Per-scenario module settings (rate limit high enough not to reject, etc.)",
+    "covered_by": "not in this module's source; lives in bench/nginx.conf",
+    "reason": "UNVERIFIABLE",
+    "source": "bench/nginx.conf"
+   }
+  ]
+ },
+ "lifted": {
+  "bench/run": []
+ },
+ "retired": [],
+ "scenarios": {
+  "bench.performance.benchmark-reporting.001": {
+   "file": "bench/specs/performance/benchmark-reporting/benchmark-results-report.feature",
+   "fingerprint": "9f1fc982c991",
+   "human": false,
+   "rule": "performance.benchmark.results-record-provenance",
+   "source": "bench/run.sh#cleanup",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bench.performance.benchmark-reporting.002": {
+   "file": "bench/specs/performance/benchmark-reporting/benchmark-results-report.feature",
+   "fingerprint": "9f1fc982c991",
+   "human": false,
+   "rule": "performance.benchmark.unknown-provenance-marked",
+   "source": "bench/run.sh#cleanup",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bench.performance.benchmark-reporting.003": {
+   "file": "bench/specs/performance/benchmark-reporting/benchmark-results-report.feature",
+   "fingerprint": "8df25b484581",
+   "human": false,
+   "rule": "performance.benchmark.unparsed-figure-shown-as-question-mark",
+   "source": "bench/run.sh#SCENARIOS",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bench.performance.benchmark-scenarios.001": {
+   "file": "bench/specs/performance/benchmark-scenarios/benchmark-module-cost.feature",
+   "fingerprint": "8df25b484581",
+   "human": false,
+   "rule": "performance.benchmark.every-scenario-measured-against-baseline",
+   "source": "bench/run.sh#SCENARIOS",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bench.performance.benchmark-scenarios.002": {
+   "file": "bench/specs/performance/benchmark-scenarios/benchmark-module-cost.feature",
+   "fingerprint": "f898245abcd1",
+   "human": false,
+   "rule": "performance.benchmark.load-settings-overridable",
+   "source": "bench/run.sh#IMAGE",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bench.performance.benchmark-scenarios.003": {
+   "file": "bench/specs/performance/benchmark-scenarios/benchmark-module-cost.feature",
+   "fingerprint": "9f1fc982c991",
+   "human": false,
+   "rule": "performance.benchmark.fail-fast-when-server-never-starts",
+   "source": "bench/run.sh#cleanup",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bench.performance.benchmark-scenarios.004": {
+   "file": "bench/specs/performance/benchmark-scenarios/benchmark-module-cost.feature",
+   "fingerprint": "9f1fc982c991",
+   "human": false,
+   "rule": "performance.benchmark.server-removed-after-run",
+   "source": "bench/run.sh#cleanup",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "bench.performance.benchmark-scenarios.005": {
+   "file": "bench/specs/performance/benchmark-scenarios/benchmark-module-cost.feature",
+   "fingerprint": "8df25b484581",
+   "human": false,
+   "rule": "performance.benchmark.load-generator-failure-aborts-run",
+   "source": "bench/run.sh#SCENARIOS",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  }
+ },
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "Capping how many requests a client may make in a time window.",
+      "slug": "rate-limiting",
+      "title": "Rate limiting"
+     },
+     {
+      "description": "Scoring requests on heuristics to spot automated clients and rejecting them.",
+      "slug": "bot-detection",
+      "title": "Bot detection"
+     }
+    ],
+    "description": "Stopping abusive or automated traffic before it reaches the upstream.",
+    "slug": "traffic-protection",
+    "title": "Traffic protection"
+   },
+   {
+    "areas": [
+     {
+      "description": "Checking signed bearer tokens before a request is admitted.",
+      "slug": "token-auth",
+      "title": "Token authentication"
+     },
+     {
+      "description": "Allowing or blocking requests by country or originating network (ASN).",
+      "slug": "geo-asn-filtering",
+      "title": "Geo and network filtering"
+     }
+    ],
+    "description": "Deciding who may reach a protected route based on identity and origin.",
+    "slug": "access-control",
+    "title": "Access control"
+   },
+   {
+    "areas": [
+     {
+      "description": "Sending a copy of each request to a secondary target for testing or analysis.",
+      "slug": "request-mirroring",
+      "title": "Request mirroring"
+     },
+     {
+      "description": "Keeping mirror failures and slowness from affecting the real response.",
+      "slug": "mirror-safety",
+      "title": "Mirror isolation"
+     }
+    ],
+    "description": "Copying live requests elsewhere without changing what the client sees.",
+    "slug": "traffic-shadowing",
+    "title": "Traffic shadowing"
+   },
+   {
+    "areas": [
+     {
+      "description": "Running a module so it logs what it would reject while letting traffic through.",
+      "slug": "log-only-mode",
+      "title": "Log-only mode"
+     },
+     {
+      "description": "The fixed log-line shape for admitted and rejected requests that rollout analysis reads.",
+      "slug": "decision-logging",
+      "title": "Decision logging"
+     },
+     {
+      "description": "Counting would-reject and rejected decisions from logs to judge a rollout.",
+      "slug": "rollout-analysis",
+      "title": "Rollout analysis"
+     }
+    ],
+    "description": "Introducing enforcement safely and seeing what it would do.",
+    "slug": "rollout-observability",
+    "title": "Rollout and observability"
+   },
+   {
+    "areas": [
+     {
+      "description": "Running load against a baseline and each module configuration in the same nginx process.",
+      "slug": "benchmark-scenarios",
+      "title": "Benchmark scenarios"
+     },
+     {
+      "description": "Starting the containerised server and load generator and failing fast if it never comes up.",
+      "slug": "benchmark-environment",
+      "title": "Benchmark environment"
+     },
+     {
+      "description": "Writing a reproducible results table with throughput, latency percentiles and exact build, hardware and revision details.",
+      "slug": "benchmark-reporting",
+      "title": "Benchmark reporting"
+     }
+    ],
+    "description": "Quantifying the cost each module adds to the request path.",
+    "slug": "performance",
+    "title": "Performance measurement"
+   },
+   {
+    "areas": [
+     {
+      "description": "Framework-free tests that run modules outside nginx against a mocked runtime.",
+      "slug": "testing",
+      "title": "Testing"
+     },
+     {
+      "description": "Pre-commit hooks, linting and secret scanning that gate changes locally and in CI.",
+      "slug": "quality-checks",
+      "title": "Quality checks"
+     },
+     {
+      "description": "Versioning the kit alongside nginx-lua releases and generating changelogs.",
+      "slug": "release",
+      "title": "Release and versioning"
+     }
+    ],
+    "description": "Building, testing, linting and releasing the kit.",
+    "slug": "developer-tooling",
+    "title": "Developer tooling"
+   }
+  ]
+ }
+}

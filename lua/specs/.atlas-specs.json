@@ -1,0 +1,1016 @@
+{
+ "excluded": {
+  "lua/bot-heuristics": [
+   {
+    "candidate": "Header order is parsed from the raw request block, lowercased, rather than from the header map",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/bot_heuristics.lua#_M.header_order"
+   },
+   {
+    "candidate": "Order penalty counts inversions instead of a longest increasing subsequence",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/bot_heuristics.lua#_M.order_penalty"
+   },
+   {
+    "candidate": "Fewer than three known headers are not judged for order",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "lua/bot_heuristics.lua#_M.order_penalty"
+   },
+   {
+    "candidate": "The total score is capped at 1",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "lua/bot_heuristics.lua#_M.score_request"
+   },
+   {
+    "candidate": "Score and reasons stored on the request context for access logging",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/bot_heuristics.lua#_M.score"
+   },
+   {
+    "candidate": "Would-reject recorded per module in a shared context map so several log-only modules all show up",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/bot_heuristics.lua#_M.score"
+   },
+   {
+    "candidate": "Exported DEFAULTS, SELF_IDENTIFYING, BROWSER_ORDER and _VERSION",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/bot_heuristics.lua#_M"
+   },
+   {
+    "candidate": "Operator options merge over the defaults",
+    "covered_by": "bots.rollout.enforced-rejection",
+    "reason": "DUPLICATE_OF",
+    "source": "lua/bot_heuristics.lua#merge"
+   },
+   {
+    "candidate": "TLS family taken from operator option or X-JA3-Family header",
+    "covered_by": "bots.scoring.tls-fingerprint-contradicts-user-agent",
+    "reason": "DUPLICATE_OF",
+    "source": "lua/bot_heuristics.lua#_M.score"
+   },
+   {
+    "candidate": "Bot scoring benchmark under nginx",
+    "covered_by": "",
+    "reason": "TECH_DEVTOOLING",
+    "source": "bench/nginx.conf"
+   }
+  ],
+  "lua/geo-asn": [
+   {
+    "candidate": "ipv4_to_int rejects octets above 255 and malformed addresses",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "lua/geo_asn.lua#ipv4_to_int"
+   },
+   {
+    "candidate": "/0 range matches every IPv4 address; invalid prefix lengths never match",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "lua/geo_asn.lua#in_cidr"
+   },
+   {
+    "candidate": "List entries compared as strings so numeric and string ASNs both match",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/geo_asn.lua#listed"
+   },
+   {
+    "candidate": "Decision reason stored in ngx.ctx.geo_reason and waf_rejected / waf_would_reject flags",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/geo_asn.lua#check"
+   },
+   {
+    "candidate": "Caller-supplied ip/country/asn override nginx variables",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/geo_asn.lua#check"
+   },
+   {
+    "candidate": "Options merged over DEFAULTS",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/geo_asn.lua#merge"
+   },
+   {
+    "candidate": "Allowed client in an allowed country passes even if country listed on denylist too (allowlist wins)",
+    "covered_by": "access-policy.geo.allow-and-deny-lists",
+    "reason": "DUPLICATE_OF",
+    "source": "lua/geo_asn.lua#list_decision"
+   },
+   {
+    "candidate": "A client inside an allowed address range is always admitted",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/geo_asn.lua#decide"
+   },
+   {
+    "candidate": "A client inside a denied address range is refused even from an allowed country or network",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/geo_asn.lua#decide"
+   },
+   {
+    "candidate": "IPv6 clients are not matched by address ranges and fall through to country and network rules",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/geo_asn.lua#in_cidr"
+   },
+   {
+    "candidate": "Country and network allow and deny lists decide whether a client is admitted",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/geo_asn.lua#decide"
+   },
+   {
+    "candidate": "Traffic no rule matches is admitted or refused according to the default posture",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/geo_asn.lua#decide"
+   },
+   {
+    "candidate": "An enforced refusal returns the configured status and logs it as rejected",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/geo_asn.lua#check"
+   },
+   {
+    "candidate": "In log-only mode a client the policy would refuse is admitted and logged as would-reject",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/geo_asn.lua#check"
+   }
+  ],
+  "lua/jwt": [
+   {
+    "candidate": "base64url decoding and padding rules",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/jwt.lua#b64url_decode"
+   },
+   {
+    "candidate": "HMAC-SHA256 built from resty.sha256 per RFC 2104",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/jwt.lua#hmac_sha256"
+   },
+   {
+    "candidate": "Constant-time signature comparison",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/jwt.lua#constant_time_equal"
+   },
+   {
+    "candidate": "Key set cached in a shared dict for jwks_ttl so one fetch serves all workers",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/jwt.lua#jwks_key"
+   },
+   {
+    "candidate": "Key set fetch uses a 2-second timeout and an overridable fetch function",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/jwt.lua#fetch"
+   },
+   {
+    "candidate": "Verified claims published to later phases via ngx.ctx.jwt; ngx.ctx.waf_rejected / waf_would_reject markers",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/jwt.lua#require_token"
+   },
+   {
+    "candidate": "\"Bearer \" prefix is optional and case-insensitive on the first letter",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "lua/jwt.lua#parse"
+   },
+   {
+    "candidate": "Token header name and rejection status are configurable",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "lua/jwt.lua#DEFAULTS"
+   },
+   {
+    "candidate": "Each log-only module that would reject is recorded alongside others",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/jwt.lua#require_token"
+   },
+   {
+    "candidate": "A correctly signed, current token reaches the upstream",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#require_token"
+   },
+   {
+    "candidate": "A request without a verifiable token is refused with 401",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#require_token"
+   },
+   {
+    "candidate": "A token naming an algorithm the deployment does not accept is refused",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#validate"
+   },
+   {
+    "candidate": "A token outside its validity window, beyond the tolerated skew, is refused",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#check_claims"
+   },
+   {
+    "candidate": "A token from another issuer or for another audience is refused",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#check_claims"
+   },
+   {
+    "candidate": "A token with no expiry is accepted indefinitely",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#check_claims"
+   },
+   {
+    "candidate": "A token is checked only against the published key it names",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#jwks_key"
+   },
+   {
+    "candidate": "When the published key set cannot be obtained, public-key tokens are refused",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#jwks_key"
+   },
+   {
+    "candidate": "The upstream receives the subject of a verified token",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#require_token"
+   },
+   {
+    "candidate": "A subject header sent by the client reaches the upstream unchanged when the edge forwards none",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#require_token"
+   },
+   {
+    "candidate": "In log-only mode, a request without a valid token is let through and recorded as a would-reject",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#require_token"
+   },
+   {
+    "candidate": "When enforcing, a refused request is logged as rejected, never as log-only",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/jwt.lua#require_token"
+   }
+  ],
+  "lua/mirror": [
+   {
+    "candidate": "Kill switch result is cached per worker and can be reset by a reload hook (reset_kill_cache)",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/mirror.lua#reset_kill_cache"
+   },
+   {
+    "candidate": "Request body is read when a request is mirrored and max_body > 0",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/mirror.lua#decide"
+   },
+   {
+    "candidate": "Decision and reason stored in the request context (dc_mirror, dc_reason)",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/mirror.lua#decide"
+   },
+   {
+    "candidate": "Gate variable name dc_mirror and the 204 short-circuit in the shadow location",
+    "covered_by": "traffic-mirroring.selection.reads-only-by-default",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/mirror.lua#decide"
+   },
+   {
+    "candidate": "Random fallback correlation id when nginx has no request_id",
+    "covered_by": "traffic-mirroring.correlation.shared-id-on-both-paths",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/mirror.lua#decide"
+   },
+   {
+    "candidate": "Capture fields path, method, status, latency_ms and at",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/mirror.lua#capture"
+   },
+   {
+    "candidate": "Empty or nil URI and body pass through scrubbing unchanged",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "lua/mirror.lua#scrub_body"
+   },
+   {
+    "candidate": "Collector request format (Host, Content-Type, Connection: close, default timeout 1000 ms)",
+    "covered_by": "traffic-mirroring.correlation.shipping-never-blocks-response",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/mirror.lua#ship"
+   },
+   {
+    "candidate": "A capture that fails JSON encoding is silently dropped",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "lua/mirror.lua#ship"
+   },
+   {
+    "candidate": "Options merge over DEFAULTS",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/mirror.lua#merge"
+   },
+   {
+    "candidate": "Requests that could write are never mirrored by default",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/mirror.lua#should_mirror"
+   },
+   {
+    "candidate": "Only the configured share of eligible requests is mirrored",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/mirror.lua#should_mirror"
+   },
+   {
+    "candidate": "Credential headers are redacted in captured requests and responses",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/mirror.lua#scrub_headers_table"
+   },
+   {
+    "candidate": "Secret query parameters are redacted in captured URLs",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/mirror.lua#scrub_query"
+   },
+   {
+    "candidate": "Chosen JSON body fields are redacted in captured response bodies",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/mirror.lua#scrub_body"
+   },
+   {
+    "candidate": "A captured response body over the size cap is truncated and marked as truncated",
+    "covered_by": "",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/mirror.lua#body_filter"
+   }
+  ],
+  "lua/ratelimit": [
+   {
+    "candidate": "State serialised into the shared dict as pipe/comma strings and decoded back",
+    "covered_by": "",
+    "reason": "TECH_PERSISTENCE",
+    "source": "lua/ratelimit.lua#encode"
+   },
+   {
+    "candidate": "Idle limit state expires after a TTL of twice its longest relevant period",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/ratelimit.lua#_M.check"
+   },
+   {
+    "candidate": "Cross-worker over-admit of about (workers - 1) requests under a concurrent burst",
+    "covered_by": "ratelimit.keys.counted-per-client-address-across-workers",
+    "reason": "UNVERIFIABLE",
+    "source": "lua/ratelimit.lua"
+   },
+   {
+    "candidate": "Sliding log keeps at most capacity timestamps",
+    "covered_by": "",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/ratelimit.lua#ALGORITHMS"
+   },
+   {
+    "candidate": "Token bucket refills at rate and never past capacity after idle; leaky bucket drains at rate",
+    "covered_by": "ratelimit.algorithms.capacity-caps-a-burst",
+    "reason": "TRIVIAL",
+    "source": "lua/ratelimit.lua#ALGORITHMS"
+   },
+   {
+    "candidate": "Per-algorithm retry-after and remaining arithmetic",
+    "covered_by": "ratelimit.throttle.over-limit-rejected-with-retry-after",
+    "reason": "INTERNAL_MECHANISM",
+    "source": "lua/ratelimit.lua#ALGORITHMS"
+   },
+   {
+    "candidate": "Defaults: token-bucket, capacity 20, rate 10, window 1, dict waf_ratelimit",
+    "covered_by": "",
+    "reason": "TRIVIAL",
+    "source": "lua/ratelimit.lua#DEFAULTS"
+   },
+   {
+    "candidate": "Long and short spellings of an algorithm count in separate quotas",
+    "covered_by": "ratelimit.keys.limits-with-same-algorithm-share-a-quota",
+    "reason": "DUPLICATE_OF",
+    "source": "lua/ratelimit.lua#_M.check"
+   }
+  ]
+ },
+ "lifted": {
+  "lua/bot-heuristics": [],
+  "lua/geo-asn": [],
+  "lua/jwt": [],
+  "lua/mirror": [],
+  "lua/ratelimit": [
+   {
+    "from_source": "lua/ratelimit.lua#_M.check",
+    "rule": "A rate limit is one quota per client across all nginx workers, not one per worker"
+   }
+  ]
+ },
+ "retired": [],
+ "scenarios": {
+  "lua.access-policy.country-rules.001": {
+   "file": "lua/specs/access-policy/country-rules/country-and-network-access-policy.feature",
+   "fingerprint": "d6270e39b4fc",
+   "human": false,
+   "rule": "access-policy.geo.country-allowlist-overrides-network-rules",
+   "source": "lua/geo_asn.lua#list_decision",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "lua.access-policy.country-rules.002": {
+   "file": "lua/specs/access-policy/country-rules/country-and-network-access-policy.feature",
+   "fingerprint": "d6270e39b4fc",
+   "human": false,
+   "rule": "access-policy.geo.unknown-country-follows-default",
+   "source": "lua/geo_asn.lua#list_decision",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "lua.authentication.signing-keys.001": {
+   "file": "lua/specs/authentication/signing-keys/published-signing-keys.feature",
+   "fingerprint": "d981daffc3fe",
+   "human": false,
+   "rule": "auth.keys.shared-secret-only-for-hs256",
+   "source": "lua/jwt.lua#verify_hs256",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "lua.authentication.token-verification.001": {
+   "file": "lua/specs/authentication/token-verification/edge-token-verification.feature",
+   "fingerprint": "12eaffe0dd0a",
+   "human": false,
+   "rule": "auth.tokens.fail-closed-without-verifier",
+   "source": "lua/jwt.lua#verify_asymmetric",
+   "status": "verified",
+   "test": "test/run.lua#an asymmetric token fails closed when the verifier is unavailable",
+   "tests": [
+    "test/run.lua#an asymmetric token fails closed when the verifier is unavailable",
+    "test/run.lua#a correctly signed HS256 token validates end to end"
+   ]
+  },
+  "lua.authentication.token-verification.002": {
+   "file": "lua/specs/authentication/token-verification/edge-token-verification.feature",
+   "fingerprint": "12eaffe0dd0a",
+   "human": false,
+   "rule": "auth.tokens.es256-signature-format",
+   "source": "lua/jwt.lua#verify_asymmetric",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "lua.bot-detection.bot-scoring.001": {
+   "file": "lua/specs/bot-detection/bot-scoring/bot-scoring.feature",
+   "fingerprint": "c795fd88a48d",
+   "human": false,
+   "rule": "bots.scoring.plausible-browser-not-flagged",
+   "source": "lua/bot_heuristics.lua#_M.score_request",
+   "status": "verified",
+   "test": "test/run.lua#a plausible browser scores low",
+   "tests": [
+    "test/run.lua#a plausible browser scores low"
+   ]
+  },
+  "lua.bot-detection.bot-scoring.002": {
+   "file": "lua/specs/bot-detection/bot-scoring/bot-scoring.feature",
+   "fingerprint": "0ba174a5f660",
+   "human": false,
+   "rule": "bots.scoring.self-identifying-client",
+   "source": "lua/bot_heuristics.lua#user_agent_signal",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "lua.bot-detection.bot-scoring.003": {
+   "file": "lua/specs/bot-detection/bot-scoring/bot-scoring.feature",
+   "fingerprint": "f701126be86b",
+   "human": false,
+   "rule": "bots.scoring.missing-browser-headers",
+   "source": "lua/bot_heuristics.lua#missing_header_signal",
+   "status": "verified",
+   "test": "test/run.lua#missing headers and no user agent add up",
+   "tests": [
+    "test/run.lua#missing headers and no user agent add up"
+   ]
+  },
+  "lua.bot-detection.bot-scoring.004": {
+   "file": "lua/specs/bot-detection/bot-scoring/bot-scoring.feature",
+   "fingerprint": "e671078c361b",
+   "human": false,
+   "rule": "bots.scoring.unusual-header-order",
+   "source": "lua/bot_heuristics.lua#header_order_signal",
+   "status": "verified",
+   "test": "test/run.lua#header order is scored by inversions against the browser order",
+   "tests": [
+    "test/run.lua#header order is scored by inversions against the browser order"
+   ]
+  },
+  "lua.bot-detection.bot-scoring.005": {
+   "file": "lua/specs/bot-detection/bot-scoring/bot-scoring.feature",
+   "fingerprint": "2f7cecff478c",
+   "human": false,
+   "rule": "bots.scoring.tls-fingerprint-contradicts-user-agent",
+   "source": "lua/bot_heuristics.lua#tls_fingerprint_signal",
+   "status": "verified",
+   "test": "test/run.lua#a TLS fingerprint that contradicts the user agent is the strongest signal",
+   "tests": [
+    "test/run.lua#a TLS fingerprint that contradicts the user agent is the strongest signal"
+   ]
+  },
+  "lua.bot-detection.bot-scoring.006": {
+   "file": "lua/specs/bot-detection/bot-scoring/bot-scoring.feature",
+   "fingerprint": "c795fd88a48d",
+   "human": false,
+   "rule": "bots.scoring.allowlisted-user-agent-exempt",
+   "source": "lua/bot_heuristics.lua#_M.score_request",
+   "status": "verified",
+   "test": "test/run.lua#the allowlist skips scoring entirely",
+   "tests": [
+    "test/run.lua#the allowlist skips scoring entirely"
+   ]
+  },
+  "lua.bot-detection.bot-scoring.007": {
+   "file": "lua/specs/bot-detection/bot-scoring/bot-scoring.feature",
+   "fingerprint": "452cb9275764",
+   "human": false,
+   "rule": "bots.scoring.http2-scored-without-order",
+   "source": "lua/bot_heuristics.lua#_M.score",
+   "status": "verified",
+   "test": "test/run.lua#an HTTP/2 request is scored without its header order, not aborted",
+   "tests": [
+    "test/run.lua#an HTTP/2 request is scored without its header order, not aborted"
+   ]
+  },
+  "lua.rate-limiting.client-keys.001": {
+   "file": "lua/specs/rate-limiting/client-keys/ratelimit-client-keys.feature",
+   "fingerprint": "937e8ef4f95e",
+   "human": false,
+   "rule": "ratelimit.keys.counted-per-client-address-across-workers",
+   "source": "lua/ratelimit.lua#_M.check",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "lua.rate-limiting.client-keys.002": {
+   "file": "lua/specs/rate-limiting/client-keys/ratelimit-client-keys.feature",
+   "fingerprint": "937e8ef4f95e",
+   "human": false,
+   "rule": "ratelimit.keys.custom-key-groups-requests",
+   "source": "lua/ratelimit.lua#_M.check",
+   "status": "verified",
+   "test": "test/run.lua#check() shares state across calls through the dict and fails open without one",
+   "tests": [
+    "test/run.lua#check() shares state across calls through the dict and fails open without one"
+   ]
+  },
+  "lua.rate-limiting.client-keys.003": {
+   "file": "lua/specs/rate-limiting/client-keys/ratelimit-client-keys.feature",
+   "fingerprint": "937e8ef4f95e",
+   "human": false,
+   "rule": "ratelimit.keys.limits-with-same-algorithm-share-a-quota",
+   "source": "lua/ratelimit.lua#_M.check",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "lua.rate-limiting.limit-algorithms.001": {
+   "file": "lua/specs/rate-limiting/limit-algorithms/ratelimit-algorithms.feature",
+   "fingerprint": "4b929110c2ac",
+   "human": false,
+   "rule": "ratelimit.algorithms.capacity-caps-a-burst",
+   "source": "lua/ratelimit.lua#_M.step",
+   "status": "verified",
+   "test": "test/run.lua#token bucket starts full and refills at the configured rate",
+   "tests": [
+    "test/run.lua#token bucket starts full and refills at the configured rate",
+    "test/run.lua#leaky bucket admits at the drain rate, not in bursts",
+    "test/run.lua#fixed window resets on the boundary, which is its known flaw",
+    "test/run.lua#sliding log is exact and expires entries by time",
+    "test/run.lua#sliding counter smooths the boundary the fixed window jumps",
+    "test/run.lua#long algorithm spellings alias to the visualiser's names"
+   ]
+  },
+  "lua.rate-limiting.limit-algorithms.002": {
+   "file": "lua/specs/rate-limiting/limit-algorithms/ratelimit-algorithms.feature",
+   "fingerprint": "4b929110c2ac",
+   "human": false,
+   "rule": "ratelimit.algorithms.window-boundary-burst",
+   "source": "lua/ratelimit.lua#_M.step",
+   "status": "verified",
+   "test": "test/run.lua#sliding counter smooths the boundary the fixed window jumps",
+   "tests": [
+    "test/run.lua#sliding counter smooths the boundary the fixed window jumps",
+    "test/run.lua#fixed window resets on the boundary, which is its known flaw"
+   ]
+  },
+  "lua.rate-limiting.limit-algorithms.003": {
+   "file": "lua/specs/rate-limiting/limit-algorithms/ratelimit-algorithms.feature",
+   "fingerprint": "4b929110c2ac",
+   "human": false,
+   "rule": "ratelimit.algorithms.unknown-algorithm-refuses-to-run",
+   "source": "lua/ratelimit.lua#_M.step",
+   "status": "verified",
+   "test": "test/run.lua#an unknown algorithm fails loudly rather than admitting everything",
+   "tests": [
+    "test/run.lua#an unknown algorithm fails loudly rather than admitting everything"
+   ]
+  },
+  "lua.rate-limiting.throttle-responses.001": {
+   "file": "lua/specs/rate-limiting/throttle-responses/ratelimit-throttling.feature",
+   "fingerprint": "f2a9b3bf9802",
+   "human": false,
+   "rule": "ratelimit.throttle.admitted-request-reports-remaining-quota",
+   "source": "lua/ratelimit.lua#_M.limit",
+   "status": "verified",
+   "test": "test/run.lua#limit() sets the rate-limit headers and rejects with the configured status",
+   "tests": [
+    "test/run.lua#limit() sets the rate-limit headers and rejects with the configured status"
+   ]
+  },
+  "lua.rate-limiting.throttle-responses.002": {
+   "file": "lua/specs/rate-limiting/throttle-responses/ratelimit-throttling.feature",
+   "fingerprint": "f2a9b3bf9802",
+   "human": false,
+   "rule": "ratelimit.throttle.over-limit-rejected-with-retry-after",
+   "source": "lua/ratelimit.lua#_M.limit",
+   "status": "verified",
+   "test": "test/run.lua#limit() sets the rate-limit headers and rejects with the configured status",
+   "tests": [
+    "test/run.lua#limit() sets the rate-limit headers and rejects with the configured status"
+   ]
+  },
+  "lua.rate-limiting.throttle-responses.003": {
+   "file": "lua/specs/rate-limiting/throttle-responses/ratelimit-throttling.feature",
+   "fingerprint": "937e8ef4f95e",
+   "human": false,
+   "rule": "ratelimit.throttle.fails-open-without-shared-zone",
+   "source": "lua/ratelimit.lua#_M.check",
+   "status": "verified",
+   "test": "test/run.lua#check() shares state across calls through the dict and fails open without one",
+   "tests": [
+    "test/run.lua#check() shares state across calls through the dict and fails open without one"
+   ]
+  },
+  "lua.safe-rollout.log-only-mode.001": {
+   "file": "lua/specs/safe-rollout/log-only-mode/bot-blocking-rollout.feature",
+   "fingerprint": "452cb9275764",
+   "human": false,
+   "rule": "bots.rollout.log-only-by-default",
+   "source": "lua/bot_heuristics.lua#_M.score",
+   "status": "verified",
+   "test": "test/run.lua#every enforcing module logs the same shape under log_only",
+   "tests": [
+    "test/run.lua#every enforcing module logs the same shape under log_only"
+   ]
+  },
+  "lua.safe-rollout.log-only-mode.002": {
+   "file": "lua/specs/safe-rollout/log-only-mode/bot-blocking-rollout.feature",
+   "fingerprint": "452cb9275764",
+   "human": false,
+   "rule": "bots.rollout.enforced-rejection",
+   "source": "lua/bot_heuristics.lua#_M.score",
+   "status": "verified",
+   "test": "test/run.lua#every enforcing module logs the same shape under log_only",
+   "tests": [
+    "test/run.lua#every enforcing module logs the same shape under log_only"
+   ]
+  },
+  "lua.safe-rollout.log-only-mode.003": {
+   "file": "lua/specs/safe-rollout/log-only-mode/bot-blocking-rollout.feature",
+   "fingerprint": "452cb9275764",
+   "human": false,
+   "rule": "bots.rollout.threshold-inclusive",
+   "source": "lua/bot_heuristics.lua#_M.score",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "lua.safe-rollout.log-only-mode.004": {
+   "file": "lua/specs/safe-rollout/log-only-mode/ratelimit-log-only.feature",
+   "fingerprint": "f2a9b3bf9802",
+   "human": false,
+   "rule": "ratelimit.rollout.log-only-admits-and-records",
+   "source": "lua/ratelimit.lua#_M.limit",
+   "status": "verified",
+   "test": "test/run.lua#log_only rolls the limiter out without rejecting anyone",
+   "tests": [
+    "test/run.lua#log_only rolls the limiter out without rejecting anyone",
+    "test/run.lua#every enforcing module logs the same shape under log_only"
+   ]
+  },
+  "lua.safe-rollout.log-only-mode.005": {
+   "file": "lua/specs/safe-rollout/log-only-mode/ratelimit-log-only.feature",
+   "fingerprint": "f2a9b3bf9802",
+   "human": false,
+   "rule": "ratelimit.rollout.enforced-rejection-logged-as-rejected",
+   "source": "lua/ratelimit.lua#_M.limit",
+   "status": "verified",
+   "test": "test/run.lua#every enforcing module logs the same shape under log_only",
+   "tests": [
+    "test/run.lua#every enforcing module logs the same shape under log_only"
+   ]
+  },
+  "lua.safe-rollout.log-only-mode.006": {
+   "file": "lua/specs/safe-rollout/log-only-mode/ratelimit-log-only.feature",
+   "fingerprint": "f2a9b3bf9802",
+   "human": false,
+   "rule": "ratelimit.rollout.log-only-still-shows-exhausted-quota",
+   "source": "lua/ratelimit.lua#_M.limit",
+   "status": "inferred",
+   "test": "",
+   "tests": []
+  },
+  "lua.traffic-mirroring.data-scrubbing.001": {
+   "file": "lua/specs/traffic-mirroring/data-scrubbing/mirror-data-scrubbing.feature",
+   "fingerprint": "c8b3dc9e388a",
+   "human": false,
+   "rule": "traffic-mirroring.scrubbing.unmirrored-requests-not-captured",
+   "source": "lua/mirror.lua#capture",
+   "status": "verified",
+   "test": "test/run.lua#capture() produces nothing for a request that was never mirrored",
+   "tests": [
+    "test/run.lua#capture() produces nothing for a request that was never mirrored"
+   ]
+  },
+  "lua.traffic-mirroring.kill-switch.001": {
+   "file": "lua/specs/traffic-mirroring/kill-switch/mirror-kill-switch.feature",
+   "fingerprint": "43152e31af20",
+   "human": false,
+   "rule": "traffic-mirroring.kill-switch.stops-all-mirroring",
+   "source": "lua/mirror.lua#killed",
+   "status": "verified",
+   "test": "test/run.lua#the kill switch beats every other rule",
+   "tests": [
+    "test/run.lua#the kill switch beats every other rule"
+   ]
+  },
+  "lua.traffic-mirroring.kill-switch.002": {
+   "file": "lua/specs/traffic-mirroring/kill-switch/mirror-kill-switch.feature",
+   "fingerprint": "43152e31af20",
+   "human": false,
+   "rule": "traffic-mirroring.kill-switch.takes-effect-within-ttl",
+   "source": "lua/mirror.lua#killed",
+   "status": "verified",
+   "test": "test/run.lua#the kill switch is cached but not forever",
+   "tests": [
+    "test/run.lua#the kill switch is cached but not forever"
+   ]
+  },
+  "lua.traffic-mirroring.request-correlation.001": {
+   "file": "lua/specs/traffic-mirroring/request-correlation/mirror-request-correlation.feature",
+   "fingerprint": "5a140feff9ab",
+   "human": false,
+   "rule": "traffic-mirroring.correlation.shared-id-on-both-paths",
+   "source": "lua/mirror.lua#decide",
+   "status": "verified",
+   "test": "test/run.lua#decide() sets the gate variable and the correlation id on both paths",
+   "tests": [
+    "test/run.lua#decide() sets the gate variable and the correlation id on both paths",
+    "test/run.lua#capture() scrubs headers, query and body together"
+   ]
+  },
+  "lua.traffic-mirroring.request-correlation.002": {
+   "file": "lua/specs/traffic-mirroring/request-correlation/mirror-request-correlation.feature",
+   "fingerprint": "f1231a7c63a1",
+   "human": false,
+   "rule": "traffic-mirroring.correlation.shipping-never-blocks-response",
+   "source": "lua/mirror.lua#ship",
+   "status": "verified",
+   "test": "test/run.lua#ship() hands off to a timer instead of blocking the response",
+   "tests": [
+    "test/run.lua#ship() hands off to a timer instead of blocking the response"
+   ]
+  }
+ },
+ "taxonomy": {
+  "domains": [
+   {
+    "areas": [
+     {
+      "description": "Parsing bearer tokens and checking their signatures against a fixed table of accepted algorithms, failing closed.",
+      "slug": "token-verification",
+      "title": "Token verification"
+     },
+     {
+      "description": "Enforcing expiry, not-before, issuer and audience claims with a tolerated clock-skew leeway.",
+      "slug": "claim-checks",
+      "title": "Claim checks"
+     },
+     {
+      "description": "Using shared secrets and fetching and caching published key sets for public-key algorithms.",
+      "slug": "signing-keys",
+      "title": "Signing keys"
+     },
+     {
+      "description": "Passing the verified subject to upstream services in a request header.",
+      "slug": "identity-forwarding",
+      "title": "Identity forwarding"
+     }
+    ],
+    "description": "Verifying who is calling at the edge so upstreams only see authenticated traffic.",
+    "slug": "authentication",
+    "title": "Authentication"
+   },
+   {
+    "areas": [
+     {
+      "description": "Choosing between token bucket, leaky bucket and window-based limits with the same semantics as the visualiser.",
+      "slug": "limit-algorithms",
+      "title": "Limit algorithms"
+     },
+     {
+      "description": "Deciding what a limit is counted against, defaulting to the client address.",
+      "slug": "client-keys",
+      "title": "Client keys"
+     },
+     {
+      "description": "Keeping counters in shared memory so all workers enforce one limit, with a bounded over-admit trade-off.",
+      "slug": "shared-limit-state",
+      "title": "Shared limit state"
+     },
+     {
+      "description": "Rejecting over-limit requests with a status code, retry-after hint and remaining-quota information.",
+      "slug": "throttle-responses",
+      "title": "Throttle responses"
+     }
+    ],
+    "description": "Capping how fast each client can send requests, consistently across worker processes.",
+    "slug": "rate-limiting",
+    "title": "Rate limiting"
+   },
+   {
+    "areas": [
+     {
+      "description": "Allow and deny lists keyed on the client's country as resolved by nginx's GeoIP lookup.",
+      "slug": "country-rules",
+      "title": "Country rules"
+     },
+     {
+      "description": "Allow and deny lists keyed on the client's autonomous system number, such as hosting providers.",
+      "slug": "network-rules",
+      "title": "Network operator rules"
+     },
+     {
+      "description": "Explicit IPv4 address and CIDR allow/deny entries that always take precedence, such as office or monitoring ranges.",
+      "slug": "ip-range-rules",
+      "title": "IP range rules"
+     },
+     {
+      "description": "The order rules are evaluated in and whether unmatched traffic is allowed or denied.",
+      "slug": "default-posture",
+      "title": "Default posture and precedence"
+     }
+    ],
+    "description": "Allowing or denying traffic by where it comes from.",
+    "slug": "access-policy",
+    "title": "Access policy"
+   },
+   {
+    "areas": [
+     {
+      "description": "Spotting missing browser headers and header orderings that real browsers never produce.",
+      "slug": "header-signals",
+      "title": "Header signals"
+     },
+     {
+      "description": "Recognising user agents that announce automation tools, and exempting trusted ones like your own monitoring.",
+      "slug": "client-identification",
+      "title": "Client self-identification"
+     },
+     {
+      "description": "Flagging clients whose TLS fingerprint contradicts the browser their user agent claims to be.",
+      "slug": "tls-fingerprinting",
+      "title": "TLS fingerprinting"
+     },
+     {
+      "description": "Combining signals into a 0-to-1 score with explanations and blocking only at or above the configured threshold.",
+      "slug": "bot-scoring",
+      "title": "Scoring and thresholds"
+     }
+    ],
+    "description": "Scoring how likely a request is to come from automation, with reasons, and acting on a chosen threshold.",
+    "slug": "bot-detection",
+    "title": "Bot detection"
+   },
+   {
+    "areas": [
+     {
+      "description": "Deciding which requests are mirrored, via sampling rate and a reads-only restriction.",
+      "slug": "mirror-selection",
+      "title": "Mirror selection"
+     },
+     {
+      "description": "Stopping all mirroring instantly from a local file or shared flag checked on every request.",
+      "slug": "kill-switch",
+      "title": "Kill switch"
+     },
+     {
+      "description": "Redacting credentials, cookies, secret query parameters and chosen body fields before a copy leaves the edge.",
+      "slug": "data-scrubbing",
+      "title": "Sensitive data scrubbing"
+     },
+     {
+      "description": "Tagging the live and shadow requests with a shared id so their outcomes can be compared.",
+      "slug": "request-correlation",
+      "title": "Request correlation"
+     }
+    ],
+    "description": "Safely copying live requests to a shadow environment for dark-canary testing.",
+    "slug": "traffic-mirroring",
+    "title": "Traffic mirroring"
+   },
+   {
+    "areas": [
+     {
+      "description": "Running any enforcing protection in a non-blocking mode that records what it would have rejected.",
+      "slug": "log-only-mode",
+      "title": "Log-only mode"
+     },
+     {
+      "description": "The fixed log-line format distinguishing would-reject from rejected, which rollout analysis depends on.",
+      "slug": "decision-logging",
+      "title": "Decision logging"
+     },
+     {
+      "description": "Tallying log-only results to judge whether a protection is ready to enforce.",
+      "slug": "rollout-analysis",
+      "title": "Rollout analysis"
+     },
+     {
+      "description": "The configurable status codes returned when a protection blocks a request.",
+      "slug": "rejection-responses",
+      "title": "Rejection responses"
+     }
+    ],
+    "description": "Introducing enforcement gradually and making every decision observable.",
+    "slug": "safe-rollout",
+    "title": "Safe rollout"
+   },
+   {
+    "areas": [
+     {
+      "description": "Make targets, git hooks, linting and the runtime-free test suite with a mocked nginx.",
+      "slug": "build-and-test",
+      "title": "Build and test"
+     },
+     {
+      "description": "Measuring the request-path cost of each module under a real nginx.",
+      "slug": "benchmarking",
+      "title": "Benchmarking"
+     },
+     {
+      "description": "Sample nginx wiring and compatibility data showing how to adopt modules incrementally.",
+      "slug": "configuration-examples",
+      "title": "Configuration examples"
+     },
+     {
+      "description": "Getting-started, architecture and reference docs published as a site.",
+      "slug": "documentation",
+      "title": "Documentation"
+     },
+     {
+      "description": "Versioning in step with nginx-lua releases, changelog generation, dependency updates and supply-chain checks.",
+      "slug": "release-and-ci",
+      "title": "Release and CI"
+     }
+    ],
+    "description": "Building, testing, benchmarking, documenting and releasing the kit.",
+    "slug": "operations",
+    "title": "Operations and developer tooling"
+   }
+  ]
+ }
+}
