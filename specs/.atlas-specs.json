@@ -111,18 +111,13 @@
   "docs/stylesheets": [],
   "nginx-lua-waf-kit/makefile": []
  },
- "retired": [],
+ "retired": [
+  "developer-tooling.make-commands.001",
+  "documentation.site-theme.001",
+  "documentation.site-theme.003",
+  "documentation.site-theme.004"
+ ],
  "scenarios": {
-  "developer-tooling.make-commands.001": {
-   "file": "specs/developer-tooling/make-commands/make-verbs.feature",
-   "fingerprint": "517de792f113",
-   "human": false,
-   "rule": "tooling.make.bare-make-lists-verbs",
-   "source": "Makefile#help",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
   "developer-tooling.make-commands.002": {
    "file": "specs/developer-tooling/make-commands/make-verbs.feature",
    "fingerprint": "e64988e8cab6",
@@ -153,42 +148,12 @@
    "test": "",
    "tests": []
   },
-  "documentation.site-theme.001": {
-   "file": "specs/documentation/site-theme/docs-site-theme.feature",
-   "fingerprint": "ac660254fd34",
-   "human": false,
-   "rule": "docs.theme.shared-accent-palette",
-   "source": "docs/stylesheets/extra.css#:root",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
   "documentation.site-theme.002": {
    "file": "specs/documentation/site-theme/docs-site-theme.feature",
    "fingerprint": "ac660254fd34",
    "human": false,
    "rule": "docs.theme.no-external-font-requests",
    "source": "docs/stylesheets/extra.css#:root",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
-  "documentation.site-theme.003": {
-   "file": "specs/documentation/site-theme/docs-site-theme.feature",
-   "fingerprint": "433084a194b6",
-   "human": false,
-   "rule": "docs.theme.legible-links-per-scheme",
-   "source": "docs/stylesheets/extra.css#[data-md-color-scheme=\"slate\"]",
-   "status": "inferred",
-   "test": "",
-   "tests": []
-  },
-  "documentation.site-theme.004": {
-   "file": "specs/documentation/site-theme/docs-site-theme.feature",
-   "fingerprint": "c702704e5aae",
-   "human": false,
-   "rule": "docs.theme.no-stand-in-logo",
-   "source": "docs/stylesheets/extra.css#.md-header__button.md-logo",
    "status": "inferred",
    "test": "",
    "tests": []

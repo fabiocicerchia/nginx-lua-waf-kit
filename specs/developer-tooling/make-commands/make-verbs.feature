@@ -5,13 +5,6 @@ Feature: Discovering and running the standard make verbs
   Background:
     Given a contributor has a checkout of nginx-lua-waf-kit
 
-  @id:developer-tooling.make-commands.001 @rule:tooling.make.bare-make-lists-verbs @inferred @source:Makefile#help
-  Scenario: Running make with no verb lists every verb with its purpose
-    When the contributor runs make with no verb
-    Then one line is printed per verb, in the order help, setup, lint, test, analyze, build, install, run, format, clean
-    And each line shows the verb name padded to ten characters followed by its one-line description
-    And nothing is built, tested or changed
-
   @id:developer-tooling.make-commands.002 @rule:tooling.make.not-applicable-verbs-explain-themselves @inferred @source:Makefile#build
   Scenario Outline: A verb that does not apply succeeds and says why it does nothing
     When the contributor runs make <verb>

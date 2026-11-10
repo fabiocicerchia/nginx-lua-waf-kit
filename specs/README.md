@@ -6,9 +6,9 @@ Tags: `@verified` a test asserts it · `@inferred` read from the code only · `@
 ## Developer tooling
 The commands and checks contributors use to work on, verify and measure the kit.
 
-- **Make commands**: [Discovering and running the standard make verbs](developer-tooling/make-commands/make-verbs.feature) (4)
+- **Make commands**: [Discovering and running the standard make verbs](developer-tooling/make-commands/make-verbs.feature) (3)
 
 ## Documentation site
 The published guides and landing page that explain the kit to users.
 
-- **Site theme and branding**: [Branding the documentation site](documentation/site-theme/docs-site-theme.feature) (5)
+- **Site theme and branding**: [Branding the documentation site](documentation/site-theme/docs-site-theme.feature) (2)
