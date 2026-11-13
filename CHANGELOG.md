@@ -5,6 +5,13 @@ All notable changes to this project are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1](https://github.com/fabiocicerchia/nginx-lua-waf-kit/compare/v1.4.0...v1.4.1) (2026-11-13)
+
+
+### Bug Fixes
+
+* **docs:** bump gitpython to 3.2.1 past five high advisories ([#76](https://github.com/fabiocicerchia/nginx-lua-waf-kit/issues/76)) ([9b9da20](https://github.com/fabiocicerchia/nginx-lua-waf-kit/commit/9b9da20577bf2d7dd880d8d18d0e891691eea362))
+
 ## [1.4.0](https://github.com/fabiocicerchia/nginx-lua-waf-kit/compare/v1.3.3...v1.4.0) (2026-09-30)
 
 
